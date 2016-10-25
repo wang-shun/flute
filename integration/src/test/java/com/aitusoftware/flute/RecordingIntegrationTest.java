@@ -94,7 +94,7 @@ public class RecordingIntegrationTest
         receiverProcess.start();
 
         long startTime = 17L;
-        long bailAt = System.currentTimeMillis() + 15000L;
+        long bailAt = getWaitTimeout();
         for (int i = 0; i < 2000000; i++)
         {
             timeTracker.begin(startTime);
