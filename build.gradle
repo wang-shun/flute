@@ -152,10 +152,57 @@ project(':acceptance') {
 
     dependencies {
         // dependencies here so that tests will be re-run on any change
-        compile project(':client'), project(':persistor'), project(':server')
+        compile project(':client'), project(':persistor'), project(':server'), project(':agent')
         compile 'com.google.code.gson:gson:2.7', 'com.google.http-client:google-http-client:1.22.0'
         compile 'junit:junit:4.12', 'org.mockito:mockito-all:1.8.4', 'org.hamcrest:hamcrest-core:1.3'
     }
+}
+
+project(':agent') {
+
+    dependencies {
+        compile project(':client')
+        compile 'net.bytebuddy:byte-buddy:1.4.19', 'net.bytebuddy:byte-buddy-agent:1.4.18'
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourcesJar, javadocJar
+    }
+
+    jar {
+        baseName = project.name
+
+        manifest.attributes('Built-By': System.properties['user.name'],
+                'Bundle-Name': fullName,
+                'Bundle-Vendor': teamName,
+                'Bundle-Description': fullDescription,
+                'Bundle-DocURL': siteUrl,
+                'Premain-Class': 'com.aitusoftware.flute.agent.intercept.Agent')
+    }
+
+    task agentBundleJar(type: Jar) {
+        manifest.attributes('Built-By': System.properties['user.name'],
+                'Bundle-Name': fullName,
+                'Bundle-Vendor': teamName,
+                'Bundle-Description': fullDescription,
+                'Bundle-DocURL': siteUrl,
+                'Premain-Class': 'com.aitusoftware.flute.agent.intercept.Agent')
+
+        baseName = project.name + '-all'
+        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+        with jar
+    }
+
 }
 
 
