@@ -1,0 +1,2 @@
+rootProject.name = 'flute'
+include 'acceptance', 'client', 'persistor', 'common', 'integration', 'server'

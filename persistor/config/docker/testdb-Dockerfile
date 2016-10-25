@@ -1,0 +1,13 @@
+# TODO should probably live in integration package
+
+FROM azul/zulu-openjdk:8
+
+WORKDIR /work
+
+COPY integration/build/libs/integration-all-0.1.1.jar deploy/
+
+ENV DATA_DIR /work
+ENV DB_DIR $DATA_DIR/flute-db
+
+CMD java -cp deploy/integration-all-0.1.1.jar \
+    com.aitusoftware.flute.integration.service.DatabaseServerMain $DB_DIR

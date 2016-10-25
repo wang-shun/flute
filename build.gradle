@@ -1,0 +1,349 @@
+/*
+ * Copyright 2016 Aitu Software Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+buildscript {
+    repositories {
+        maven{url 'http://jcenter.bintray.com'}
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'me.champeau.gradle:jmh-gradle-plugin:0.3.1'
+        classpath 'gradle.plugin.net.minecrell:licenser:0.3'
+    }
+}
+apply plugin: 'me.champeau.gradle.jmh'
+apply plugin: 'java'
+
+
+defaultTasks 'check', 'licenseFormat'
+
+version = new Version(major: 0, minor: 1, revision: 1)
+
+ext {
+    fullName = 'Flute'
+    fullDescription = 'Flute'
+    teamName = 'Aitu Software Limited'
+    siteUrl = 'https://aitusoftware.com'
+    sourceUrl = 'https://github.com/aitusoftware/flute'
+
+    javaCompilerExecutable = System.env['JAVA_HOME'] ? System.env['JAVA_HOME'] + '/bin/javac' : 'javac'
+}
+
+
+dependencies {
+    compile 'org.openjdk.jmh:jmh-core:1.15'
+    compile 'org.openjdk.jmh:jmh-generator-bytecode:1.15'
+    jmh 'org.openjdk.jmh:jmh-core:1.15'
+    jmh 'org.openjdk.jmh:jmh-generator-annprocess:1.15'
+    jmh 'org.openjdk.jmh:jmh-generator-bytecode:1.15'
+    compile 'org.openjdk.jol:jol-core:0.6'
+    compile 'org.openjdk.jol:jol-cli:0.6'
+}
+
+subprojects {
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'checkstyle'
+    apply plugin: 'me.champeau.gradle.jmh'
+    apply plugin: 'net.minecrell.licenser'
+
+    license {
+        header = project.file('../HEADER.txt')
+        newLine = false
+        exclude '**/vendor/**/*'
+        exclude '**/*.properties'
+        exclude '**/*.sql'
+    }
+
+
+    sourceSets {
+        main {
+            java {
+                srcDir 'src/main/java'
+            }
+            resources {
+                srcDir 'src/main/resources'
+            }
+       }
+
+        test {
+            java {
+                srcDir 'src/test/java'
+            }
+            resources {
+                srcDir 'src/test/resources'
+            }
+        }
+    }
+
+    repositories {
+        mavenCentral()
+        maven{url 'http://jcenter.bintray.com'}
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+
+    dependencies {
+        compile 'org.slf4j:slf4j-api:1.7.21', 'org.slf4j:slf4j-log4j12:1.7.21'
+        testCompile 'junit:junit:4.12', 'org.mockito:mockito-all:1.8.4', 'org.hamcrest:hamcrest-core:1.3'
+
+
+        compile 'org.openjdk.jmh:jmh-core:1.15'
+        compile 'org.openjdk.jmh:jmh-generator-bytecode:1.15'
+        jmh 'org.openjdk.jmh:jmh-core:1.15'
+        jmh 'org.openjdk.jmh:jmh-generator-annprocess:1.15'
+        jmh 'org.openjdk.jmh:jmh-generator-bytecode:1.15'
+        compile 'org.openjdk.jol:jol-core:0.6'
+        compile 'org.openjdk.jol:jol-cli:0.6'
+
+    }
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    jar {
+        baseName = project.name
+
+        manifest.attributes('Built-By': System.properties['user.name'],
+                'Bundle-Name': fullName,
+                'Bundle-Vendor': teamName,
+                'Bundle-Description': fullDescription,
+                'Bundle-DocURL': siteUrl)
+    }
+
+    checkstyle {
+        toolVersion = "6.3"
+    }
+
+    version = new Version(major: 0, minor: 1, revision: 1)
+    task bundleJar(type: Jar) {
+        manifest.attributes('Built-By': System.properties['user.name'],
+                'Bundle-Name': fullName,
+                'Bundle-Vendor': teamName,
+                'Bundle-Description': fullDescription,
+                'Bundle-DocURL': siteUrl)
+
+        baseName = project.name + '-all'
+        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+        with jar
+    }
+
+}
+
+project(':acceptance') {
+
+    dependencies {
+        // dependencies here so that tests will be re-run on any change
+        compile project(':client'), project(':persistor'), project(':server')
+        compile 'com.google.code.gson:gson:2.7', 'com.google.http-client:google-http-client:1.22.0'
+        compile 'junit:junit:4.12', 'org.mockito:mockito-all:1.8.4', 'org.hamcrest:hamcrest-core:1.3'
+    }
+}
+
+
+project(':client') {
+
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
+    repositories {
+        maven{url 'http://jcenter.bintray.com'}
+    }
+    jmh {
+        jmhVersion = '1.15'
+        duplicateClassesStrategy = 'warn'
+        fork = 1
+        benchmarkMode = ['avgt']
+        timeUnit = 'ns'
+        warmupIterations = 5
+        iterations = 5
+    }
+
+    dependencies {
+        compile project(':common')
+        compile 'org.hdrhistogram:HdrHistogram:2.1.8'
+
+        compile 'org.openjdk.jmh:jmh-generator-bytecode:1.15'
+        compile 'org.openjdk.jmh:jmh-core:1.15'
+        jmh 'org.openjdk.jmh:jmh-core:1.15'
+        jmh 'org.openjdk.jmh:jmh-generator-annprocess:1.15'
+        jmh 'org.openjdk.jmh:jmh-generator-bytecode:1.15'
+        compile 'org.openjdk.jol:jol-core:0.6'
+        compile 'org.openjdk.jol:jol-cli:0.6'
+
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourcesJar, javadocJar
+    }
+}
+
+
+
+project(':integration') {
+
+//    version = new Version(major: 0, revision: 1)
+    dependencies {
+        compile project(':common'), project(':client'), project(':persistor')
+        compile 'org.hdrhistogram:HdrHistogram:2.1.8', 'com.h2database:h2:1.4.191'
+        testCompile 'com.google.code.gson:gson:2.5', 'junit:junit:4.12', 'org.mockito:mockito-all:1.8.4', 'org.hamcrest:hamcrest-core:1.3'
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourcesJar, javadocJar
+    }
+}
+
+project(':common') {
+
+//    version = new Version(major: 0, revision: 1)
+
+    dependencies {
+        compile 'org.flywaydb:flyway-core:4.0', 'com.h2database:h2:1.4.191'
+        compile 'org.hdrhistogram:HdrHistogram:2.1.8'
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourcesJar, javadocJar
+    }
+}
+
+project(':persistor') {
+
+//    version = new Version(major: 0, revision: 1)
+
+    dependencies {
+        compile project(':common')
+        compile 'org.hdrhistogram:HdrHistogram:2.1.8', 'log4j:log4j:1.2.17'
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourcesJar, javadocJar
+    }
+}
+
+project(':server') {
+
+//    version = new Version(major: 0, revision: 1)
+
+    dependencies {
+        compile project(':common')
+        compile 'com.google.code.gson:gson:2.7'
+        compile 'org.hdrhistogram:HdrHistogram:2.1.8', 'org.eclipse.jetty:jetty-server:9.3.8.v20160314', 'org.flywaydb:flyway-core:4.0', 'com.h2database:h2:1.4.191', 'log4j:log4j:1.2.17'
+        testCompile 'com.h2database:h2:1.4.191'
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourcesJar, javadocJar
+    }
+}
+
+task startBackend(type:Exec, dependsOn: ':killServices') {
+    ignoreExitValue true
+    commandLine 'bash', 'scripts/start-backend.sh'
+}
+
+task killServices(type: Exec) {
+    ignoreExitValue true
+    commandLine 'bash', 'scripts/kill-services.sh'
+}
+
+task acceptanceTest(type: Exec) {
+    commandLine 'bash', 'scripts/run-acceptance-tests.sh'
+}
+
+task buildDockerImages(type: Exec, dependsOn: ':killDockerContainers') {
+    commandLine 'bash', 'scripts/build-docker-images.sh'
+}
+
+task runDockerContainers(type: Exec, dependsOn: ':buildDockerImages') {
+    commandLine 'bash', 'scripts/run-docker-instances.sh'
+}
+
+task killDockerContainers(type: Exec) {
+    ignoreExitValue true
+    commandLine 'bash', 'scripts/kill-docker-instances.sh'
+}
+
+task redeploy(dependsOn: ':runDockerContainers') {
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.1'
+}
+
+class Version {
+    int major = 0, minor = 0, revision = 0
+
+    String toString() {
+        "$major.$minor.$revision"
+    }
+}
+
