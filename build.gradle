@@ -208,8 +208,6 @@ project(':client') {
 
 
 project(':integration') {
-
-//    version = new Version(major: 0, revision: 1)
     dependencies {
         compile project(':common'), project(':client'), project(':persistor')
         compile 'org.hdrhistogram:HdrHistogram:2.1.8', 'com.h2database:h2:1.4.191'
@@ -233,8 +231,6 @@ project(':integration') {
 
 project(':common') {
 
-//    version = new Version(major: 0, revision: 1)
-
     dependencies {
         compile 'org.flywaydb:flyway-core:4.0', 'com.h2database:h2:1.4.191'
         compile 'org.hdrhistogram:HdrHistogram:2.1.8'
@@ -257,8 +253,6 @@ project(':common') {
 
 project(':persistor') {
 
-//    version = new Version(major: 0, revision: 1)
-
     dependencies {
         compile project(':common')
         compile 'org.hdrhistogram:HdrHistogram:2.1.8', 'log4j:log4j:1.2.17'
@@ -280,8 +274,6 @@ project(':persistor') {
 }
 
 project(':server') {
-
-//    version = new Version(major: 0, revision: 1)
 
     dependencies {
         compile project(':common')

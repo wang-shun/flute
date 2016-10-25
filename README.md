@@ -8,6 +8,8 @@ __Flute__ is a tool for measuring and recording application request latency
 in order to provide accurate and detailed SLA reporting for 
 internal or external consumption.  
 
+[![Build Status](https://travis-ci.org/aitusoftware/flute.svg)](https://travis-ci.org/aitusoftware/flute)
+
 ![Flute Architecture](doc/img/FluteArchitecture.png "Flute Architecture")
 
 At its core, __Flute__ provides three components:
