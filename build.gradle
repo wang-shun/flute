@@ -32,8 +32,6 @@ apply plugin: 'java'
 
 defaultTasks 'check', 'licenseFormat'
 
-version = new Version(major: 0, minor: 1, revision: 2)
-
 ext {
     fullName = 'Flute'
     fullDescription = 'Flute'
@@ -72,6 +70,7 @@ subprojects {
         exclude '**/*.sql'
     }
 
+    version = new Version(major: 0, minor: 1, revision: 2)
 
     sourceSets {
         main {
@@ -133,7 +132,6 @@ subprojects {
         toolVersion = "6.3"
     }
 
-    version = new Version(major: 0, minor: 1, revision: 1)
     task bundleJar(type: Jar) {
         manifest.attributes('Built-By': System.properties['user.name'],
                 'Bundle-Name': fullName,
@@ -192,7 +190,7 @@ project(':agent') {
                 'Premain-Class': 'com.aitusoftware.flute.agent.intercept.Agent')
     }
 
-    task agentBundleJar(type: Jar) {
+    bundleJar {
         manifest.attributes('Built-By': System.properties['user.name'],
                 'Bundle-Name': fullName,
                 'Bundle-Vendor': teamName,
