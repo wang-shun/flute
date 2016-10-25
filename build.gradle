@@ -32,7 +32,7 @@ apply plugin: 'java'
 
 defaultTasks 'check', 'licenseFormat'
 
-version = new Version(major: 0, minor: 1, revision: 1)
+version = new Version(major: 0, minor: 1, revision: 2)
 
 ext {
     fullName = 'Flute'
