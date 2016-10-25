@@ -22,7 +22,7 @@ or use a `ValueRecorder` if calculating request latency of an asynchronous reque
 
 ### Installation & configuration
 
-Download the latest version here.
+Download the latest version [here](https://github.com/aitusoftware/flute/releases/tag/v0.1.2).
 
 __Flute__ services can be run either in standalone mode, or embedded into your existing application infrastructure.
 The steps below describe the fastest way to get up & running for an exploration of __Flute__.
