@@ -75,3 +75,5 @@ return new RecordingTimeTrackerFactory().
     withHistogramConfig(new HistogramConfig(100000, 3)).
     create();
 ```
+
+   * client module [javadoc](https://aitusoftware.github.io/flute/javadoc/client/)
