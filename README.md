@@ -66,7 +66,7 @@ java -cp ./flute-persistor-all-0.0.1 com.aitusoftware.flute.archive.FluteMetrics
 
 * Client configuration
    * code configuration:
-```
+```java
 return new RecordingTimeTrackerFactory().
     publishingTo(new InetSocketAddress("127.0.0.1", 51000)).
     withSenderEvents(new ExceptionTrackingAggregatorEvents(sendExceptions)).
