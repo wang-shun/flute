@@ -30,7 +30,7 @@ Simple configuration is managed using Java properties files.
 
 
 * Global configuration
-   * Histogram configuration - this describes the constructor arguments used to create `Histograms` throughout the system
+   * Histogram configuration - this describes the constructor arguments used to create histograms throughout the system
       * `flute.histogram.maxValue=100000`
       * `flute.histogram.significantDigits=3`
 
@@ -48,7 +48,7 @@ Ensure that the specified database exists, and that the user has `CREATE` privil
 A persistor instance can then be started by running the following command:
 
 ```
-java -cp ./flute-persistor-all-0.0.1 com.aitusoftware.flute.archive.FluteMetricsPersistorMain /path/to/config.properties
+java -cp ./flute-persistor-all-0.1.2 com.aitusoftware.flute.archive.FluteMetricsPersistorMain /path/to/config.properties
 ```
 
 * Server configuration
@@ -79,3 +79,17 @@ return new RecordingTimeTrackerFactory().
 ```
 
    * client module [javadoc](https://aitusoftware.github.io/flute/javadoc/client/)
+
+
+__Flute__ comes with a Java _agent_, which can be used to inject a `Stopwatch` into user code without modification.
+
+* Java agent configuration
+   * Annotate required methods with `@FluteMetric`
+   * Enable the _agent_ with the following command line:
+      * `-javaagent:flute-agent-all-0.1.2.jar=/path/to/agent.properties`
+   * Set the following properties:
+      * flute.histogram.maxValue=100000
+      * flute.histogram.significantDigits=3
+      * flute.client.reporting.tcp.address=127.0.0.1:51000
+      * flute.client.publication.interval=1
+      * flute.client.publication.unit=MINUTES
