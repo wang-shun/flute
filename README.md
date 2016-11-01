@@ -88,8 +88,8 @@ __Flute__ comes with a Java _agent_, which can be used to inject a `Stopwatch` i
    * Enable the _agent_ with the following command line:
       * `-javaagent:flute-agent-all-0.1.2.jar=/path/to/agent.properties`
    * Set the following properties:
-      * flute.histogram.maxValue=100000
-      * flute.histogram.significantDigits=3
-      * flute.client.reporting.tcp.address=127.0.0.1:51000
-      * flute.client.publication.interval=1
-      * flute.client.publication.unit=MINUTES
+      * `flute.histogram.maxValue=100000`
+      * `flute.histogram.significantDigits=3`
+      * `flute.client.reporting.tcp.address=127.0.0.1:51000`
+      * `flute.client.publication.interval=1`
+      * `flute.client.publication.unit=MINUTES`
