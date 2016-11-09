@@ -37,7 +37,6 @@ public final class TimingClientMain
         final Properties properties = new Properties();
         properties.load(new FileReader(args[0]));
 
-        final SocketAddress samplingAddress = fromAddressSpec(RequiredProperties.requiredProperty("flute.test.acceptance.reporting.udp.address", properties));
         final SocketAddress recordingAddress = fromAddressSpec(RequiredProperties.requiredProperty("flute.test.acceptance.reporting.tcp.address", properties));
         final HistogramConfig histogramConfig = HistogramConfig.fromFluteProperties(properties);
 

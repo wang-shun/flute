@@ -18,7 +18,6 @@ package com.aitusoftware.flute.archive;
 import com.aitusoftware.flute.config.DatabaseConfig;
 import com.aitusoftware.flute.config.HistogramConfig;
 import com.aitusoftware.flute.config.TcpReceiverConfig;
-import com.aitusoftware.flute.config.UdpReceiverConfig;
 import com.aitusoftware.flute.lifecycle.ShutdownListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,15 +43,13 @@ public final class FluteMetricsPersistorMain
 
         final Consumer<SQLException> persistenceExceptionConsumer = FluteMetricsPersistorMain::logException;
         final Consumer<Exception> receiverExceptionConsumer = FluteMetricsPersistorMain::logException;
-        final Consumer<Throwable> processingExceptionConsumer = FluteMetricsPersistorMain::logException;
         final DatabaseConfig databaseConfig = DatabaseConfig.fromFluteProperties(properties, "metrics");
-        final UdpReceiverConfig udpReceiverConfig = UdpReceiverConfig.fromFluteProperties(properties);
         final TcpReceiverConfig tcpReceiverConfig = TcpReceiverConfig.fromFluteProperties(properties);
         final HistogramConfig histogramConfig = HistogramConfig.fromFluteProperties(properties);
 
         final FluteMetricsPersistor persistor =
-                new FluteMetricsPersistor(databaseConfig, udpReceiverConfig, tcpReceiverConfig, histogramConfig,
-                        processingExceptionConsumer, receiverExceptionConsumer, persistenceExceptionConsumer);
+                new FluteMetricsPersistor(databaseConfig, tcpReceiverConfig, histogramConfig,
+                        receiverExceptionConsumer, persistenceExceptionConsumer);
 
         persistor.start();
         new ShutdownListener(14001).waitForShutdownEvent();

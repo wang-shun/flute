@@ -21,7 +21,6 @@ import com.aitusoftware.flute.config.FluteThreadFactory;
 import com.aitusoftware.flute.config.FlywayProperties;
 import com.aitusoftware.flute.config.HistogramConfig;
 import com.aitusoftware.flute.config.TcpReceiverConfig;
-import com.aitusoftware.flute.config.UdpReceiverConfig;
 import com.aitusoftware.flute.factory.HistogramReceiverFactory;
 import com.aitusoftware.flute.receive.ReceiverProcess;
 
@@ -37,27 +36,21 @@ import static java.util.concurrent.Executors.newCachedThreadPool;
 public final class FluteMetricsPersistor
 {
     private final DatabaseConfig databaseConfig;
-    private final UdpReceiverConfig udpReceiverConfig;
     private final TcpReceiverConfig tcpReceiverConfig;
     private final HistogramConfig histogramConfig;
-    private final Consumer<Throwable> processingExceptionConsumer;
     private final Consumer<Exception> receiverExceptionConsumer;
     private final Consumer<SQLException> persistenceExceptionConsumer;
 
     public FluteMetricsPersistor(
             final DatabaseConfig databaseConfig,
-            final UdpReceiverConfig udpReceiverConfig,
             final TcpReceiverConfig tcpReceiverConfig,
             final HistogramConfig histogramConfig,
-            final Consumer<Throwable> processingExceptionConsumer,
             final Consumer<Exception> receiverExceptionConsumer,
             final Consumer<SQLException> persistenceExceptionConsumer)
     {
         this.databaseConfig = databaseConfig;
-        this.udpReceiverConfig = udpReceiverConfig;
         this.tcpReceiverConfig = tcpReceiverConfig;
         this.histogramConfig = histogramConfig;
-        this.processingExceptionConsumer = processingExceptionConsumer;
         this.receiverExceptionConsumer = receiverExceptionConsumer;
         this.persistenceExceptionConsumer = persistenceExceptionConsumer;
     }
