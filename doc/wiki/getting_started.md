@@ -40,8 +40,8 @@ com.aitusoftware.flute.integration.service.DatabaseServerMain $DB_DIR
 
 The `Persistor` is the component responsible for receiving histogram data from clients, and storing it in the database.
 
-Using [acceptance-test-flute.properties](https://github.com/aitusoftware/flute/blob/master/integration/src/test/resources/acceptance-test-flute.properties) 
-as a guide, configure the `persistor` to use your database of choice in `$CONFIG_FILE`:
+Using [example-persistor-config.properties](https://github.com/aitusoftware/flute/blob/master/doc/samples/config/example-persistor-config.properties) 
+as a guide, configure the `persistor`:
  
 ```
 # replace with your metrics database url, or leave if using the bundled h2 database
@@ -69,7 +69,9 @@ com.aitusoftware.flute.archive.FluteMetricsPersistorMain $CONFIG_FILE
 The `Server` component is responsible for serving reports generated from stored histogram data. 
 Custom reports can be generated, and their meta-data will be stored in a separate database.
 
-The `server` requires its own config; required properties are as follows:
+Using [example-server-config.properties](https://github.com/aitusoftware/flute/blob/master/doc/samples/config/example-server-config.properties) 
+as a guide, configure the `server`:
+
 
 ```
 # replace with your metrics database url, or leave if using the bundled h2 database
@@ -107,14 +109,20 @@ com.aitusoftware.flute.server.http.HttpQueryServerMain $CONFIG_FILE
 
 Now that the server components are up and running, it's time to send some data for recording.
 
-Just to test that everything is working ok, we are going to run a `HiccupClient`, which requires a config file
-containing the following properties:
+Just to test that everything is working ok, we are going to run a `HiccupClient`.
+
+
+Using [example-client-config.properties](https://github.com/aitusoftware/flute/blob/master/doc/samples/config/example-client-config.properties) 
+as a guide, configure the `HiccupClient`:
+
 
 ```
 flute.test.acceptance.reporting.tcp.address=0.0.0.0:51000
 flute.histogram.maxValue=100000
 flute.histogram.significantDigits=3
 ```
+
+
 
    1. Execute command:
 
