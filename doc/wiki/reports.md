@@ -9,11 +9,15 @@ one millisecond, and record the time in microseconds taken to return from the _s
 In order to simulate some pauses that might be experienced by a real-life application, `HiccupClient` will generate lots of
 garbage to try to force the garbage collector to run.
 
+See [Getting Started](https://github.com/aitusoftware/flute/wiki/GettingStarted#generating-data) for information on how to start 
+the `HiccupClient`.
+
 In this way, we can build a picture of the magnitude and frequency of the pauses suffered by our applications.
 
-## Creating a report
+# Creating a report
 
-If you are running the __Flute__ server locally, the reports interface can be found at the following address:
+If you are running the __Flute__ server locally (see [Getting Started](https://github.com/aitusoftware/flute/wiki/GettingStarted)), 
+the reports interface can be found at the following address:
 
 [`http://localhost:15002/flute/resources/html/reports.html`](http://localhost:15002/flute/resources/html/reports.html)
 

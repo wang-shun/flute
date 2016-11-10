@@ -20,6 +20,11 @@ or use a `ValueRecorder` if calculating request latency of an asynchronous reque
 * flute-server - serves historic data and manages SLA reports.
 
 
+### Try it out
+
+Follow instructions [on the wiki](https://github.com/aitusoftware/flute/wiki/GettingStarted).
+
+
 ### Installation & configuration
 
 Download the latest version [here](https://github.com/aitusoftware/flute/releases/tag/v0.1.2).
