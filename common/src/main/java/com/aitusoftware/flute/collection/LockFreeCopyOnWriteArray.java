@@ -15,10 +15,9 @@
  */
 package com.aitusoftware.flute.collection;
 
-import com.aitusoftware.flute.compatibility.Consumer;
-
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 public final class LockFreeCopyOnWriteArray<T>
 {
