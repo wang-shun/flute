@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Utility class to swap two instances of a type between a single-writer and single-reader thread.
+ * Utility class to swap two instances of a type between multiple writers and a single reader thread.
  *
  * @param <T> instance type
  */

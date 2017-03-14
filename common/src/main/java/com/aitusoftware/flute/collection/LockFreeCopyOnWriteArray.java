@@ -24,8 +24,6 @@ public final class LockFreeCopyOnWriteArray<T>
 {
     private AtomicReference<Object[]> holder = new AtomicReference<>(new Object[0]);
 
-
-
     @SuppressWarnings("unchecked")
     public void add(final T item)
     {

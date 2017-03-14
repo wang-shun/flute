@@ -16,7 +16,6 @@
 package com.aitusoftware.flute.send;
 
 import com.aitusoftware.flute.collection.LockFreeCopyOnWriteArray;
-import com.aitusoftware.flute.compatibility.Consumer;
 import com.aitusoftware.flute.compatibility.Supplier;
 import com.aitusoftware.flute.exchanger.Exchanger;
 import com.aitusoftware.flute.protocol.Version;
@@ -33,7 +32,7 @@ import java.util.concurrent.locks.LockSupport;
 public final class NonBlockingAggregator implements Runnable
 {
     private final LockFreeCopyOnWriteArray<SocketChannelAndExchanger> exchangers =
-            new LockFreeCopyOnWriteArray<SocketChannelAndExchanger>();
+            new LockFreeCopyOnWriteArray<>();
     private final NonBlockingSocketChannelConnector socketChannelConnector;
     private final long pollInterval;
     private final TimeUnit pollUnit;
@@ -56,76 +55,70 @@ public final class NonBlockingAggregator implements Runnable
     {
         while (!Thread.currentThread().isInterrupted())
         {
-            try
-            {
-
-                exchangers.forEach(new Consumer<SocketChannelAndExchanger>()
-                {
-                    @Override
-                    public void accept(final SocketChannelAndExchanger unit)
-                    {
-                        try
-                        {
-
-                            unit.exchanger.poll();
-                            if (unit.socketChannel == null)
-                            {
-                                tryConnect(unit);
-                            }
-                        }
-                        catch (RuntimeException e)
-                        {
-                            aggregatorEvents.exceptionInSendLoop(e);
-                        }
-                    }
-                });
-
-                exchangers.forEach(new Consumer<SocketChannelAndExchanger>()
-                {
-                    @Override
-                    public void accept(final SocketChannelAndExchanger unit)
-                    {
-                        try
-                        {
-
-                            try
-                            {
-                                if (unit.socketChannel != null)
-                                {
-                                    final WritableByteChannel dataSink = unit.socketChannel;
-                                    if (unit.needsToSendVersion())
-                                    {
-                                        unit.writeVersion(dataSink);
-                                    }
-                                    else
-                                    {
-                                        unit.sender.send(dataSink);
-                                    }
-                                }
-                            }
-                            catch (final IOException e)
-                            {
-                                unit.socketChannel = null;
-                                unit.sender.clear();
-                                aggregatorEvents.failedToSendDataForSender(unit.identifier, e);
-                            }
-
-                        }
-                        catch (RuntimeException e)
-                        {
-                            aggregatorEvents.exceptionInSendLoop(e);
-                        }
-                    }
-                });
-
-            }
-            catch (RuntimeException e)
-            {
-                aggregatorEvents.exceptionInSendLoop(e);
-            }
+            exchangers.forEach(this::pollExchanger);
+            exchangers.forEach(this::sendPendingData);
 
             LockSupport.parkNanos(pollUnit.toNanos(pollInterval));
         }
+    }
+
+    private void pollExchanger(final SocketChannelAndExchanger unit)
+    {
+        try
+        {
+            unit.exchanger.poll();
+            if (unit.socketChannel == null)
+            {
+                tryConnect(unit);
+            }
+        }
+        catch (RuntimeException e)
+        {
+            logExceptionInSendLoop(e);
+        }
+    }
+
+    private void sendPendingData(final SocketChannelAndExchanger unit)
+    {
+        try
+        {
+            try
+            {
+                if (unit.socketChannel != null)
+                {
+                    final WritableByteChannel dataSink = unit.socketChannel;
+                    if (unit.needsToSendVersion())
+                    {
+                        unit.writeVersion(dataSink);
+                    }
+                    else
+                    {
+                        unit.sender.send(dataSink);
+                    }
+                }
+            }
+            catch (final IOException e)
+            {
+                unit.socketChannel = null;
+                unit.sender.clear();
+                reportFailureToSendData(unit, e);
+            }
+
+        }
+        catch (RuntimeException e)
+        {
+            logExceptionInSendLoop(e);
+        }
+    }
+
+    private void reportFailureToSendData(final SocketChannelAndExchanger unit, final IOException e)
+    {
+        aggregatorEvents.failedToSendDataForSender(unit.identifier, e);
+    }
+
+    private void logExceptionInSendLoop(final RuntimeException e)
+    {
+        aggregatorEvents.exceptionInSendLoop(e);
     }
 
     private void tryConnect(final SocketChannelAndExchanger unit)
