@@ -43,6 +43,18 @@ public final class NonBlockingSocketChannelConnector
                 return null;
             }
             channel.configureBlocking(false);
+            // TODO this needs some kind of back-off
+            /*
+                    at java.nio.channels.SocketChannel.open(SocketChannel.java:189)
+        at com.aitusoftware.flute.send.SocketChannelConnector.get(SocketChannelConnector.java:41)
+        at com.aitusoftware.flute.send.SocketChannelConnector.get(SocketChannelConnector.java:25)
+        at com.aitusoftware.flute.send.NonBlockingSocketChannelConnector.registerSenderWithSocket(NonBlockingSocketChannelConnector.java:40)
+        at com.aitusoftware.flute.send.NonBlockingAggregator.tryConnect(NonBlockingAggregator.java:133)
+        at com.aitusoftware.flute.send.NonBlockingAggregator.access$200(NonBlockingAggregator.java:33)
+        at com.aitusoftware.flute.send.NonBlockingAggregator$1.accept(NonBlockingAggregator.java:73)
+        at com.aitusoftware.flute.send.NonBlockingAggregator$1.accept(NonBlockingAggregator.java:63)
+        at com.aitusoftware.flute.collection.LockFreeCopyOnWriteArray.forEach(LockFreeCopyOnWriteArray.java:73)
+             */
             return channel;
         }
         catch (IOException e)

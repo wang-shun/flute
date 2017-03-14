@@ -16,6 +16,7 @@
 package com.aitusoftware.flute.send.events;
 
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
 public interface AggregatorEvents
@@ -47,9 +48,10 @@ public interface AggregatorEvents
 
     /**
      * Called when the system fails to establish a connection to the persistor
+     * @param address the target address
      * @param e the exception
      */
-    void failedToConnectToPersistor(final IOException e);
+    void failedToConnectToPersistor(final SocketAddress address, final IOException e);
 
     /**
      * Called when queuing of data failed, for example if data rate exceeds the maximum send rate

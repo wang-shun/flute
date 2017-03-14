@@ -25,9 +25,12 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class StreamingHistogramReceiver
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(StreamingHistogramReceiver.class);
     private static final int PAYLOAD_SIZE_NOT_SET = -1;
     private static final int BYTE_LENGTH_OF_INT = 4;
     private final HistogramHandler histogramHandler;
@@ -48,6 +51,7 @@ public final class StreamingHistogramReceiver
         final int read = channel.read(buffer);
         if(read == -1)
         {
+            // TODO could be perfectly valid shutdown, consider returning a token to indicate end-of-stream
             throw new IOException("End of stream");
         }
 
@@ -74,6 +78,13 @@ public final class StreamingHistogramReceiver
             {
                 headerInfo.set(buffer);
                 final Histogram histogram = Histogram.decodeFromByteBuffer(buffer, highestTrackableValue);
+
+                if(LOGGER.isDebugEnabled())
+                {
+                    LOGGER.debug("Received histogram for {}, sample count {}",
+                        headerInfo.getIdentifier(), histogram.getTotalCount());
+                }
+
                 histogramHandler.histogramReceived(
                         socketAddress,
                         headerInfo.getIdentifier(),

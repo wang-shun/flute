@@ -15,6 +15,7 @@
  */
 package com.aitusoftware.flute.send.events;
 
+import java.net.SocketAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,9 +51,9 @@ public final class LoggingAggregatorEvents implements AggregatorEvents
     }
 
     @Override
-    public void failedToConnectToPersistor(final IOException e)
+    public void failedToConnectToPersistor(SocketAddress address, final IOException e)
     {
-        LOGGER.warn("Failed to connect to persistor", e);
+        LOGGER.warn(String.format("Failed to connect to persistor, address: %s", address), e);
     }
 
     @Override

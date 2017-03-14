@@ -17,7 +17,6 @@ package com.aitusoftware.flute.send;
 
 import com.aitusoftware.flute.compatibility.Supplier;
 import com.aitusoftware.flute.send.events.AggregatorEvents;
-
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.SocketChannel;
@@ -42,7 +41,7 @@ public final class SocketChannelConnector implements Supplier<SocketChannel>
         }
         catch (IOException e)
         {
-            aggregatorEvents.failedToConnectToPersistor(e);
+            aggregatorEvents.failedToConnectToPersistor(address, e);
             return null;
         }
     }

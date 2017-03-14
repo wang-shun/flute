@@ -22,6 +22,7 @@ import com.aitusoftware.flute.factory.RecordingTimeTrackerFactory;
 import com.aitusoftware.flute.receive.ReceiverProcess;
 import com.aitusoftware.flute.record.TimeTracker;
 import com.aitusoftware.flute.send.events.AggregatorEvents;
+import java.net.SocketAddress;
 import org.HdrHistogram.Histogram;
 import org.junit.After;
 import org.junit.Assert;
@@ -267,7 +268,7 @@ public class RecordingIntegrationTest
         }
 
         @Override
-        public void failedToConnectToPersistor(final IOException e)
+        public void failedToConnectToPersistor(SocketAddress address, final IOException e)
         {
             sendExceptions.add(e);
         }

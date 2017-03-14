@@ -27,9 +27,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.function.Consumer;
 import java.util.zip.Deflater;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class HistogramInsertDao implements HistogramHandler
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HistogramInsertDao.class);
     public static final int ONE_MEGABYTE = 1024 * 1024;
     private static final String INSERT_SQL = "INSERT INTO histogram_data (sender, identifier, start_timestamp, end_timestamp, " +
             "min_value, mean, fifty, ninety, two_nines, three_nines, four_nines, five_nines, max_value, total_count, raw_data) " +
@@ -81,6 +84,11 @@ public final class HistogramInsertDao implements HistogramHandler
             if(statement.executeUpdate() == 0)
             {
                 throw new SQLException("Failed to insert data", statement.getWarnings());
+            }
+
+            if(LOGGER.isDebugEnabled())
+            {
+                LOGGER.debug("Successfully recorded histogram for {}", identifier.toString());
             }
         }
         catch(final SQLException e)

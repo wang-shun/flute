@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 
 public final class Waiter
 {
-    private static final long TIMEOUT_MILLIS = 10000L;
+    private static final long TIMEOUT_MILLIS = 20000L;
 
     public static void waitFor(final Supplier<Boolean> condition)
     {
