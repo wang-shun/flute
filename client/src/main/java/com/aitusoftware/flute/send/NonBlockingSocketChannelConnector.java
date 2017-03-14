@@ -45,6 +45,9 @@ public final class NonBlockingSocketChannelConnector
             channel.configureBlocking(false);
             // TODO this needs some kind of back-off
             /*
+            NonBlockingAggregator.pollInterval (currently 10ms hard-coded)
+            Decouple data poll from connection attempt.
+
                     at java.nio.channels.SocketChannel.open(SocketChannel.java:189)
         at com.aitusoftware.flute.send.SocketChannelConnector.get(SocketChannelConnector.java:41)
         at com.aitusoftware.flute.send.SocketChannelConnector.get(SocketChannelConnector.java:25)
