@@ -22,7 +22,6 @@ import com.aitusoftware.flute.factory.RecordingTimeTrackerFactory;
 import com.aitusoftware.flute.receive.ReceiverProcess;
 import com.aitusoftware.flute.record.TimeTracker;
 import com.aitusoftware.flute.send.events.AggregatorEvents;
-import java.net.SocketAddress;
 import org.HdrHistogram.Histogram;
 import org.junit.After;
 import org.junit.Assert;
@@ -30,8 +29,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedByInterruptException;
@@ -71,7 +70,7 @@ public class RecordingIntegrationTest
     @Before
     public void before() throws Exception
     {
-        socketAddress = new InetSocketAddress(InetAddress.getLocalHost(), 41200);
+        socketAddress = new InetSocketAddress("0.0.0.0", 41200);
         checkNoReceiverIsCurrentlyListening();
         serverSocketChannel = ServerSocketChannel.open();
         serverSocketChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
@@ -283,7 +282,7 @@ public class RecordingIntegrationTest
     private TimeTracker createTimeTracker(final String identifer) throws IOException
     {
         return new RecordingTimeTrackerFactory().
-                publishingTo(socketAddress).
+                publishingTo(new InetSocketAddress("localhost", socketAddress.getPort())).
                 withSenderEvents(new ExceptionTrackingAggregatorEvents(sendExceptions)).
                 withValidation(true).
                 withIdentifer(identifer).
