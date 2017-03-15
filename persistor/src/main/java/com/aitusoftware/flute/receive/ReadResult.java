@@ -15,10 +15,8 @@
  */
 package com.aitusoftware.flute.receive;
 
-import org.HdrHistogram.Histogram;
-
-@FunctionalInterface
-public interface HistogramPublicationPredicate
+public enum ReadResult
 {
-    boolean test(final Histogram histogram, final long publicationTimestamp);
+    OK,
+    END_OF_STREAM
 }

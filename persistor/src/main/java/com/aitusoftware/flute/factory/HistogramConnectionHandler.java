@@ -16,6 +16,7 @@
 package com.aitusoftware.flute.factory;
 
 import com.aitusoftware.flute.receive.HistogramHandler;
+import com.aitusoftware.flute.receive.ReadResult;
 import com.aitusoftware.flute.receive.StreamingHistogramReceiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,7 @@ public final class HistogramConnectionHandler
         this.histogramHandler = histogramHandler;
     }
 
+    // TODO refactor this mess
     public void receiveLoop()
     {
         if(running.compareAndSet(false, true))
@@ -84,19 +86,23 @@ public final class HistogramConnectionHandler
                                     {
                                         final StreamingHistogramReceiver receiver = (StreamingHistogramReceiver) selectedKey.attachment();
 
-                                        receiver.readFrom((ReadableByteChannel) channel, (InetSocketAddress) ((SocketChannel) channel).getRemoteAddress());
+                                        final ReadResult readResult = receiver.readFrom((ReadableByteChannel) channel,
+                                                (InetSocketAddress) ((SocketChannel) channel).getRemoteAddress());
+
+                                        if(readResult == ReadResult.END_OF_STREAM)
+                                        {
+                                            closeQuietly(selectedKey, channel);
+                                        }
                                     }
                                     catch (final Exception e)
                                     {
-                                        selectedKey.cancel();
-                                        channel.close();
+                                        closeQuietly(selectedKey, channel);
                                         exceptionConsumer.accept(e);
                                     }
                                     finally
                                     {
                                         iterator.remove();
                                     }
-
                                 }
                             }
                         }
@@ -146,6 +152,19 @@ public final class HistogramConnectionHandler
                 LOGGER.error("Failed to open selector, exiting", e);
                 exceptionConsumer.accept(e);
             }
+        }
+    }
+
+    private static void closeQuietly(final SelectionKey selectedKey, final SelectableChannel channel)
+    {
+        selectedKey.cancel();
+        try
+        {
+            channel.close();
+        }
+        catch (IOException e)
+        {
+            // ignore
         }
     }
 

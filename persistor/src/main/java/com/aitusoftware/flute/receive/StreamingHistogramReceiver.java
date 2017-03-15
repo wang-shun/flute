@@ -46,13 +46,12 @@ public final class StreamingHistogramReceiver
         this.highestTrackableValue = highestTrackableValue;
     }
 
-    public void readFrom(final ReadableByteChannel channel, final InetSocketAddress socketAddress) throws IOException
+    public ReadResult readFrom(final ReadableByteChannel channel, final InetSocketAddress socketAddress) throws IOException
     {
         final int read = channel.read(buffer);
         if(read == -1)
         {
-            // TODO could be perfectly valid shutdown, consider returning a token to indicate end-of-stream
-            throw new IOException("End of stream");
+            return ReadResult.END_OF_STREAM;
         }
 
         buffer.flip();
@@ -102,5 +101,6 @@ public final class StreamingHistogramReceiver
         }
 
         buffer.compact();
+        return ReadResult.OK;
     }
 }
