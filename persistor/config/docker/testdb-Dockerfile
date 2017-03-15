@@ -1,5 +1,3 @@
-# TODO should probably live in integration package
-
 FROM azul/zulu-openjdk:8
 
 WORKDIR /work
