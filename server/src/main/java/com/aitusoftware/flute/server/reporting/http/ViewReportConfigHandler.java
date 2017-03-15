@@ -15,7 +15,7 @@
  */
 package com.aitusoftware.flute.server.reporting.http;
 
-import com.aitusoftware.flute.server.dao.MetricIdentifierDao;
+import com.aitusoftware.flute.server.dao.jdbc.MetricIdentifierDao;
 import com.aitusoftware.flute.server.http.ReportingConfigSerialiser;
 import com.aitusoftware.flute.server.reporting.dao.ReportDao;
 import com.aitusoftware.flute.server.reporting.domain.ReportSpecification;

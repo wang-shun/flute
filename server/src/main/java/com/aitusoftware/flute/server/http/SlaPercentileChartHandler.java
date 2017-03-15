@@ -16,8 +16,8 @@
 package com.aitusoftware.flute.server.http;
 
 import com.aitusoftware.flute.server.cache.HistogramCache;
-import com.aitusoftware.flute.server.dao.HistogramRetrievalDao;
-import com.aitusoftware.flute.server.dao.MetricIdentifierDao;
+import com.aitusoftware.flute.server.dao.jdbc.HistogramRetrievalDao;
+import com.aitusoftware.flute.server.dao.jdbc.MetricIdentifierDao;
 import com.aitusoftware.flute.server.query.FullHistogramHandler;
 import com.aitusoftware.flute.server.query.Query;
 import org.HdrHistogram.Histogram;

@@ -15,7 +15,7 @@
  */
 package com.aitusoftware.flute.server.http;
 
-import com.aitusoftware.flute.server.dao.MetricIdentifierDao;
+import com.aitusoftware.flute.server.dao.jdbc.MetricIdentifierDao;
 import com.aitusoftware.flute.server.reporting.domain.Threshold;
 import com.aitusoftware.flute.server.reporting.domain.TimeWindow;
 

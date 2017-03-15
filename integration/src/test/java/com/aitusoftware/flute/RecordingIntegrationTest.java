@@ -359,7 +359,7 @@ public class RecordingIntegrationTest
     {
         try
         {
-            if (SocketChannel.open(socketAddress).isConnected())
+            if (SocketChannel.open(new InetSocketAddress("127.0.0.1", socketAddress.getPort())).isConnected())
             {
                 Assert.fail("Something already listening");
             }

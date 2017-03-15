@@ -15,6 +15,7 @@
  */
 package com.aitusoftware.flute.archive;
 
+import com.aitusoftware.flute.archive.jdbc.HistogramInsertDao;
 import org.HdrHistogram.Histogram;
 import org.h2.Driver;
 import org.junit.After;

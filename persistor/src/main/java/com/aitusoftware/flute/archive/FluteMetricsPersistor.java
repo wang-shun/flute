@@ -15,6 +15,7 @@
  */
 package com.aitusoftware.flute.archive;
 
+import com.aitusoftware.flute.archive.jdbc.HistogramInsertDao;
 import com.aitusoftware.flute.config.ConnectionFactory;
 import com.aitusoftware.flute.config.DatabaseConfig;
 import com.aitusoftware.flute.config.FluteThreadFactory;

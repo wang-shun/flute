@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.aitusoftware.flute.server.dao;
+package com.aitusoftware.flute.server.dao.jdbc;
 
 import com.aitusoftware.flute.config.ConnectionFactory;
 import com.aitusoftware.flute.config.HistogramConfig;
 import com.aitusoftware.flute.server.cache.HistogramQueryFunction;
+import com.aitusoftware.flute.server.dao.HistogramAggregator;
 import com.aitusoftware.flute.server.query.FullHistogramHandler;
 import com.aitusoftware.flute.server.query.Query;
 import org.HdrHistogram.Histogram;

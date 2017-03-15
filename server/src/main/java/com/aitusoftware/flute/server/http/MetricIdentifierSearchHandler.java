@@ -15,7 +15,7 @@
  */
 package com.aitusoftware.flute.server.http;
 
-import com.aitusoftware.flute.server.dao.MetricIdentifierDao;
+import com.aitusoftware.flute.server.dao.jdbc.MetricIdentifierDao;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.aitusoftware.flute.archive;
+package com.aitusoftware.flute.archive.jdbc;
 
 import com.aitusoftware.flute.receive.HistogramHandler;
 import com.aitusoftware.flute.util.lang.StringTrimmer;

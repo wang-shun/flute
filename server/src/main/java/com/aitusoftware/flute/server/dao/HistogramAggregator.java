@@ -28,16 +28,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.zip.DataFormatException;
 
-final class HistogramAggregator
+public final class HistogramAggregator
 {
     private final HistogramConfig histogramConfig;
 
-    HistogramAggregator(final HistogramConfig histogramConfig)
+    public HistogramAggregator(final HistogramConfig histogramConfig)
     {
         this.histogramConfig = histogramConfig;
     }
 
-    Histogram aggregate(final FullHistogramHandler handler,
+    public Histogram aggregate(final FullHistogramHandler handler,
                    final String identifierDescription,
                    final ByteBuffer buffer,
                    final ResultSet resultSet,

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.aitusoftware.flute.server.dao;
+package com.aitusoftware.flute.server.dao.jdbc;
 
 import com.aitusoftware.flute.config.ConnectionFactory;
 
