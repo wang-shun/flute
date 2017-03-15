@@ -35,6 +35,7 @@ import static java.util.concurrent.Executors.newCachedThreadPool;
 
 public final class FluteMetricsPersistor
 {
+    private static final int ONE_MEGABYTE = 1024 * 1024;
     private final DatabaseConfig databaseConfig;
     private final TcpReceiverConfig tcpReceiverConfig;
     private final HistogramConfig histogramConfig;
@@ -59,7 +60,7 @@ public final class FluteMetricsPersistor
     {
         final ConnectionFactory connectionFactory = new ConnectionFactory(databaseConfig);
         final HistogramInsertDao insertDao = new HistogramInsertDao(connectionFactory.getConnection(),
-                persistenceExceptionConsumer, HistogramInsertDao.ONE_MEGABYTE);
+                persistenceExceptionConsumer, ONE_MEGABYTE);
 
         new ManagedDatabase().init(new FlywayProperties(databaseConfig).getProperties());
         try
