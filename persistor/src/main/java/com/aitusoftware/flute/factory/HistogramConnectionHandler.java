@@ -91,6 +91,10 @@ public final class HistogramConnectionHandler
 
                                         if(readResult == ReadResult.END_OF_STREAM)
                                         {
+                                            if(LOGGER.isDebugEnabled())
+                                            {
+                                                LOGGER.debug("Inbound connection was closed: {}", ((SocketChannel) channel).getRemoteAddress());
+                                            }
                                             closeQuietly(selectedKey, channel);
                                         }
                                     }
