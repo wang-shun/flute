@@ -46,7 +46,7 @@ public final class HiccupClient
         final Properties properties = new Properties();
         properties.load(new FileReader(args[0]));
 
-        final SocketAddress recordingAddress = SocketAddressParser.fromAddressSpec(RequiredProperties.requiredProperty("flute.test.acceptance.reporting.tcp.address", properties));
+        final SocketAddress recordingAddress = SocketAddressParser.fromAddressSpec(RequiredProperties.requiredProperty("flute.client.reporting.tcp.address", properties));
         final HistogramConfig histogramConfig = HistogramConfig.fromFluteProperties(properties);
 
         final RecordingTimeTrackerFactory timeTrackerFactory = new RecordingTimeTrackerFactory().
