@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.zip.DataFormatException;
 
@@ -37,19 +36,20 @@ public final class HistogramAggregator
         this.histogramConfig = histogramConfig;
     }
 
-    public Histogram aggregate(final FullHistogramHandler handler,
-                   final String identifierDescription,
-                   final ByteBuffer buffer,
-                   final ResultSet resultSet,
-                   final long startMillis) throws SQLException
+    public Histogram aggregate(
+            final FullHistogramHandler handler,
+            final String identifierDescription,
+            final ByteBuffer buffer,
+            final HistogramIterator histogramIterator,
+            final long startMillis) throws SQLException
     {
         final Histogram composite = new Histogram(histogramConfig.getMaxValue(), histogramConfig.getSignificantDigits());
 
         try
         {
-            while (resultSet.next())
+            while (histogramIterator.next())
             {
-                try (final InputStream histogramDataStream = resultSet.getBinaryStream("raw_data"))
+                try (final InputStream histogramDataStream = histogramIterator.getHistogramData())
                 {
                     buffer.clear();
                     final ReadableByteChannel inputChannel = Channels.newChannel(histogramDataStream);
@@ -62,10 +62,10 @@ public final class HistogramAggregator
                             Histogram.decodeFromCompressedByteBuffer(buffer, histogramConfig.getMaxValue());
                     if(composite.getTotalCount() == 0L)
                     {
-                        composite.setStartTimeStamp(resultSet.getLong("start_timestamp"));
+                        composite.setStartTimeStamp(histogramIterator.getStartTimestamp());
                     }
                     composite.add(component);
-                    composite.setEndTimeStamp(resultSet.getLong("end_timestamp"));
+                    composite.setEndTimeStamp(histogramIterator.getEndTimestamp());
                 }
                 catch (IOException | DataFormatException | RuntimeException e)
                 {
@@ -81,7 +81,7 @@ public final class HistogramAggregator
 
             return composite;
         }
-        catch (final SQLException e)
+        catch (final IOException e)
         {
             throw new RuntimeException("Query failed", e);
         }

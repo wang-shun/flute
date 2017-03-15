@@ -21,7 +21,7 @@ import java.io.InputStream;
 public interface HistogramIterator
 {
     InputStream getHistogramData() throws IOException;
-    boolean hasNext() throws IOException;
+    boolean next() throws IOException;
     long getStartTimestamp() throws IOException;
     long getEndTimestamp() throws IOException;
 }

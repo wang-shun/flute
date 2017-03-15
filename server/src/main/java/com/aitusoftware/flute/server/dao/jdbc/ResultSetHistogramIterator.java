@@ -22,11 +22,11 @@ import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public final class ResultSetHistogramIterator implements HistogramIterator
+final class ResultSetHistogramIterator implements HistogramIterator
 {
     private final ResultSet resultSet;
 
-    public ResultSetHistogramIterator(final ResultSet resultSet)
+    ResultSetHistogramIterator(final ResultSet resultSet)
     {
         this.resultSet = resultSet;
     }
@@ -45,7 +45,7 @@ public final class ResultSetHistogramIterator implements HistogramIterator
     }
 
     @Override
-    public boolean hasNext() throws IOException
+    public boolean next() throws IOException
     {
         try
         {

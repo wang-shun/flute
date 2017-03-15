@@ -159,7 +159,8 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
             {
                 BUFFER.set(ByteBuffer.allocate(maxEncodedHistogramSize));
             }
-            return aggregator.aggregate(handler, metricKey, BUFFER.get(), resultSet, startMillis);
+            return aggregator.aggregate(handler, metricKey, BUFFER.get(),
+                    new ResultSetHistogramIterator(resultSet), startMillis);
         }
         catch (SQLException e)
         {
