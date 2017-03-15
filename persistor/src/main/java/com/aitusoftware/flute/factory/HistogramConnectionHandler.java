@@ -45,7 +45,7 @@ public final class HistogramConnectionHandler
     private final HistogramHandler histogramHandler;
     private final AtomicBoolean running = new AtomicBoolean(false);
 
-    public HistogramConnectionHandler(
+    HistogramConnectionHandler(
             final ServerSocketChannel serverSocketChannel,
             final Consumer<Exception> exceptionConsumer,
             final long highestTrackableValue,
@@ -59,7 +59,6 @@ public final class HistogramConnectionHandler
         this.histogramHandler = histogramHandler;
     }
 
-    // TODO refactor this mess
     public void receiveLoop()
     {
         if(running.compareAndSet(false, true))
@@ -68,93 +67,124 @@ public final class HistogramConnectionHandler
             try
             {
                 final Selector selector = Selector.open();
-                executorService.submit(() ->
-                {
-                    while (running.get() && !Thread.currentThread().isInterrupted())
-                    {
-                        try
-                        {
-                            final int selected = selector.select(100);
-                            if (selected != 0)
-                            {
-                                final Set<SelectionKey> selectedKeys = selector.selectedKeys();
-                                for (Iterator<SelectionKey> iterator = selectedKeys.iterator(); iterator.hasNext(); )
-                                {
-                                    final SelectionKey selectedKey = iterator.next();
-                                    final SelectableChannel channel = selectedKey.channel();
-                                    try
-                                    {
-                                        final StreamingHistogramReceiver receiver = (StreamingHistogramReceiver) selectedKey.attachment();
-
-                                        final ReadResult readResult = receiver.readFrom((ReadableByteChannel) channel,
-                                                (InetSocketAddress) ((SocketChannel) channel).getRemoteAddress());
-
-                                        if(readResult == ReadResult.END_OF_STREAM)
-                                        {
-                                            if(LOGGER.isDebugEnabled())
-                                            {
-                                                LOGGER.debug("Inbound connection was closed: {}", ((SocketChannel) channel).getRemoteAddress());
-                                            }
-                                            closeQuietly(selectedKey, channel);
-                                        }
-                                    }
-                                    catch (final Exception e)
-                                    {
-                                        closeQuietly(selectedKey, channel);
-                                        exceptionConsumer.accept(e);
-                                    }
-                                    finally
-                                    {
-                                        iterator.remove();
-                                    }
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            exceptionConsumer.accept(e);
-                        }
-                    }
-                    try
-                    {
-                        selector.keys().forEach(s ->
-                        {
-                            try
-                            {
-                                s.channel().close();
-                            }
-                            catch (IOException e)
-                            {
-                                // ignore
-                            }
-                        });
-                        selector.close();
-                    }
-                    catch (IOException e)
-                    {
-                        // ignore for now
-                    }
-                });
-
-                while (running.get() && !Thread.currentThread().isInterrupted() && serverSocketChannel.isOpen())
-                {
-                    try
-                    {
-                        final SocketChannel clientChannel = serverSocketChannel.accept();
-
-                        clientChannel.configureBlocking(false);
-                        clientChannel.register(selector, SelectionKey.OP_READ, new StreamingHistogramReceiver(histogramHandler, highestTrackableValue));
-                    }
-                    catch (final Exception e)
-                    {
-                        exceptionConsumer.accept(e);
-                    }
-                }
+                executorService.submit(new InboundDataProcessor(running, selector, exceptionConsumer));
+                acceptIncomingConnections(selector);
             }
             catch (final IOException e)
             {
                 LOGGER.error("Failed to open selector, exiting", e);
                 exceptionConsumer.accept(e);
+            }
+        }
+    }
+
+    private void acceptIncomingConnections(final Selector selector)
+    {
+        while (running.get() && !Thread.currentThread().isInterrupted() && serverSocketChannel.isOpen())
+        {
+            try
+            {
+                final SocketChannel clientChannel = serverSocketChannel.accept();
+
+                clientChannel.configureBlocking(false);
+                clientChannel.register(selector, SelectionKey.OP_READ, new StreamingHistogramReceiver(histogramHandler, highestTrackableValue));
+            }
+            catch (final Exception e)
+            {
+                exceptionConsumer.accept(e);
+            }
+        }
+    }
+
+    private static final class InboundDataProcessor implements Runnable
+    {
+        private final AtomicBoolean running;
+        private final Selector selector;
+        private final Consumer<Exception> exceptionConsumer;
+
+        InboundDataProcessor(final AtomicBoolean running, final Selector selector,
+                             final Consumer<Exception> exceptionConsumer)
+        {
+            this.running = running;
+            this.selector = selector;
+            this.exceptionConsumer = exceptionConsumer;
+        }
+
+        @Override
+        public void run()
+        {
+            while (running.get() && !Thread.currentThread().isInterrupted())
+            {
+                try
+                {
+                    if (selector.select(100) != 0)
+                    {
+                        processSelectedKeys();
+                    }
+                }
+                catch (Exception e)
+                {
+                    exceptionConsumer.accept(e);
+                }
+            }
+            closeActiveConnections();
+        }
+
+        private void processSelectedKeys()
+        {
+            final Set<SelectionKey> selectedKeys = selector.selectedKeys();
+            for (Iterator<SelectionKey> iterator = selectedKeys.iterator(); iterator.hasNext(); )
+            {
+                final SelectionKey selectedKey = iterator.next();
+                final SelectableChannel channel = selectedKey.channel();
+                try
+                {
+                    final StreamingHistogramReceiver receiver = (StreamingHistogramReceiver) selectedKey.attachment();
+
+                    final ReadResult readResult = receiver.readFrom((ReadableByteChannel) channel,
+                            (InetSocketAddress) ((SocketChannel) channel).getRemoteAddress());
+
+                    if(readResult == ReadResult.END_OF_STREAM)
+                    {
+                        if(LOGGER.isDebugEnabled())
+                        {
+                            LOGGER.debug("Inbound connection was closed: {}", ((SocketChannel) channel).getRemoteAddress());
+                        }
+                        closeQuietly(selectedKey, channel);
+                    }
+                }
+                catch (final Exception e)
+                {
+                    closeQuietly(selectedKey, channel);
+                    exceptionConsumer.accept(e);
+                }
+                finally
+                {
+                    iterator.remove();
+                }
+            }
+        }
+
+        private void closeActiveConnections()
+        {
+            try
+            {
+                selector.keys().forEach(s ->
+                {
+                    try
+                    {
+                        s.channel().close();
+                    }
+                    catch (IOException e)
+                    {
+                        // ignore
+                    }
+                });
+                selector.close();
+            }
+            catch (IOException e)
+            {
+                // ignore for now
             }
         }
     }
