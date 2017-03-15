@@ -22,6 +22,7 @@ import com.aitusoftware.flute.exchanger.Exchanger;
 import com.aitusoftware.flute.protocol.Version;
 import com.aitusoftware.flute.protocol.VersionCodec;
 import com.aitusoftware.flute.send.events.AggregatorEvents;
+import com.aitusoftware.flute.util.timing.SystemEpochMillisTimeSupplier;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -40,6 +41,8 @@ public final class NonBlockingAggregator implements Runnable
     private final AggregatorEvents aggregatorEvents;
     private final Consumer<SocketChannelAndExchanger> exchangePollingConsumer = new ExchangePollingConsumer();
     private final Consumer<SocketChannelAndExchanger> pendingDataSenderConsumer = new PendingDataSender();
+    private final ConnectionAttemptThrottler throttler =
+            new ConnectionAttemptThrottler(new SystemEpochMillisTimeSupplier(), 250L, 5000L, TimeUnit.SECONDS);
 
     public NonBlockingAggregator(
             final Supplier<SocketChannel> socketChannelSupplier,
@@ -113,7 +116,6 @@ public final class NonBlockingAggregator implements Runnable
                     unit.sender.clear();
                     reportFailureToSendData(unit, e);
                 }
-
             }
             catch (RuntimeException e)
             {
@@ -134,8 +136,12 @@ public final class NonBlockingAggregator implements Runnable
 
     private void tryConnect(final SocketChannelAndExchanger unit)
     {
-        final SocketChannel socketChannel = socketChannelConnector.registerSenderWithSocket();
-        unit.reset(socketChannel);
+        if(throttler.shouldAttemptConnection())
+        {
+            final SocketChannel socketChannel = socketChannelConnector.registerSenderWithSocket();
+            unit.reset(socketChannel);
+            throttler.connectionSuccessful();
+        }
     }
 
     public void register(final Exchanger exchanger, final AggregatingDataSender sender, final String identifier)
@@ -150,7 +156,6 @@ public final class NonBlockingAggregator implements Runnable
         private final String identifier;
         private final ByteBuffer version = VersionCodec.asBuffer(Version.ONE);
         private SocketChannel socketChannel;
-
 
         private SocketChannelAndExchanger(
                 final Exchanger exchanger,
