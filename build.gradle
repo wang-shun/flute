@@ -20,6 +20,7 @@ buildscript {
         maven {
             url "https://plugins.gradle.org/m2/"
         }
+        mavenCentral()
     }
     dependencies {
         classpath 'me.champeau.gradle:jmh-gradle-plugin:0.3.1'
@@ -28,6 +29,7 @@ buildscript {
 }
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'java'
+apply plugin: 'maven'
 
 group = 'com.aitusoftware'
 
@@ -38,7 +40,7 @@ ext {
     fullDescription = 'Flute'
     teamName = 'Aitu Software Limited'
     siteUrl = 'https://github.com/aitusoftware/flute'
-    sourceUrl = 'git@github.com:aitusoftware/flute'
+    sourceUrl = 'https://github.com/aitusoftware/flute.git'
 
     javaCompilerExecutable = System.env['JAVA_HOME'] ? System.env['JAVA_HOME'] + '/bin/javac' : 'javac'
     if (!project.hasProperty('sonatypeUrl')) sonatypeUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
@@ -52,8 +54,9 @@ def projectPom = {
     url = siteUrl
 
     scm {
-        url = "scm:$sourceUrl"
-        connection = "scm:$sourceUrl"
+        url = "$sourceUrl"
+        connection = "scm:git:https://github.com/aitusoftware.com/flute.git"
+        developerConnection = "scm:git:https://github.com/aitusoftware.com/flute.git"
     }
 
     licenses {
@@ -101,6 +104,8 @@ subprojects {
         exclude '**/*.properties'
         exclude '**/*.sql'
     }
+
+    group = 'com.aitusoftware'
 
     version = new Version(major: 0, minor: 1, revision: 2)
 
@@ -399,11 +404,10 @@ class Version {
         "$major.$minor.$revision"
     }
 }
-//
-//install {
-//    repositories.mavenInstaller.pom.project(projectPom)
-//}
 
+install {
+    repositories.mavenInstaller.pom.project(projectPom)
+}
 
 task uploadAllArchives {
     dependsOn 'server:uploadArchives', 'client:uploadArchives',
