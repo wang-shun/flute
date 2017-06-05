@@ -46,6 +46,32 @@ ext {
     if (!project.hasProperty('sonatypePassword')) sonatypePassword = ''
 }
 
+def projectPom = {
+    name = fullName
+    description = fullDescription
+    url = siteUrl
+
+    scm {
+        url = "scm:$sourceUrl"
+        connection = "scm:$sourceUrl"
+    }
+
+    licenses {
+        license {
+            name = 'The Apache Software License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution = 'repo'
+        }
+    }
+
+    developers {
+        developer {
+            id = 'epickrram'
+            name = 'epickrram'
+            email = 'flute@aitusoftware.com'
+        }
+    }
+}
 
 dependencies {
     compile 'org.openjdk.jmh:jmh-core:1.15'
@@ -65,6 +91,8 @@ subprojects {
     apply plugin: 'checkstyle'
     apply plugin: 'me.champeau.gradle.jmh'
     apply plugin: 'net.minecrell.licenser'
+    apply plugin: 'signing'
+    apply plugin: 'maven'
 
     license {
         header = project.file('../HEADER.txt')
@@ -75,6 +103,11 @@ subprojects {
     }
 
     version = new Version(major: 0, minor: 1, revision: 2)
+
+    signing {
+        required { gradle.taskGraph.hasTask('uploadArchives') }
+        sign configurations.archives
+    }
 
     sourceSets {
         main {
@@ -207,6 +240,17 @@ project(':agent') {
         with jar
     }
 
+    uploadArchives {
+        repositories.mavenDeployer {
+            beforeDeployment { deployment -> signing.signPom(deployment) }
+
+            repository(url: sonatypeUrl) {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project(projectPom)
+        }
+    }
 }
 
 
@@ -240,6 +284,18 @@ project(':client') {
         compile 'org.openjdk.jol:jol-cli:0.6'
 
     }
+
+    uploadArchives {
+        repositories.mavenDeployer {
+            beforeDeployment { deployment -> signing.signPom(deployment) }
+
+            repository(url: sonatypeUrl) {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project(projectPom)
+        }
+    }
 }
 
 
@@ -266,6 +322,18 @@ project(':persistor') {
         compile project(':common')
         compile 'org.hdrhistogram:HdrHistogram:2.1.8', 'log4j:log4j:1.2.17', 'org.slf4j:slf4j-api:1.7.21', 'org.slf4j:slf4j-log4j12:1.7.21'
     }
+
+    uploadArchives {
+        repositories.mavenDeployer {
+            beforeDeployment { deployment -> signing.signPom(deployment) }
+
+            repository(url: sonatypeUrl) {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project(projectPom)
+        }
+    }
 }
 
 project(':server') {
@@ -275,6 +343,18 @@ project(':server') {
         compile 'com.google.code.gson:gson:2.7', 'org.slf4j:slf4j-api:1.7.21', 'org.slf4j:slf4j-log4j12:1.7.21'
         compile 'org.hdrhistogram:HdrHistogram:2.1.8', 'org.eclipse.jetty:jetty-server:9.3.8.v20160314', 'org.flywaydb:flyway-core:4.0', 'com.h2database:h2:1.4.191', 'log4j:log4j:1.2.17'
         testCompile 'com.h2database:h2:1.4.191'
+    }
+
+    uploadArchives {
+        repositories.mavenDeployer {
+            beforeDeployment { deployment -> signing.signPom(deployment) }
+
+            repository(url: sonatypeUrl) {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project(projectPom)
+        }
     }
 }
 
@@ -319,51 +399,13 @@ class Version {
         "$major.$minor.$revision"
     }
 }
+//
+//install {
+//    repositories.mavenInstaller.pom.project(projectPom)
+//}
 
-def projectPom = {
-    name = fullName
-    description = fullDescription
-    url = siteUrl
 
-    scm {
-        url = "scm:$sourceUrl"
-        connection = "scm:$sourceUrl"
-    }
-
-    licenses {
-        license {
-            name = 'The Apache Software License, Version 2.0'
-            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-            distribution = 'repo'
-        }
-    }
-
-    developers {
-        developer {
-            id = 'epickrram'
-            name = 'epickrram'
-            email = 'flute@aitusoftware.com'
-        }
-    }
-}
-
-install {
-    repositories.mavenInstaller.pom.project(projectPom)
-}
-
-signing {
-    required { gradle.taskGraph.hasTask('uploadArchives') }
-    sign configurations.archives
-}
-
-uploadArchives {
-    repositories.mavenDeployer {
-        beforeDeployment { deployment -> signing.signPom(deployment) }
-
-        repository(url: sonatypeUrl) {
-            authentication(userName: sonatypeUsername, password: sonatypePassword)
-        }
-
-        pom.project(projectPom)
-    }
+task uploadAllArchives {
+    dependsOn 'server:uploadArchives', 'client:uploadArchives',
+            'persistor:uploadArchives', 'agent:uploadArchives'
 }
