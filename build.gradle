@@ -29,6 +29,7 @@ buildscript {
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'java'
 
+group = 'com.aitusoftware'
 
 defaultTasks 'check', 'licenseFormat'
 
@@ -36,10 +37,13 @@ ext {
     fullName = 'Flute'
     fullDescription = 'Flute'
     teamName = 'Aitu Software Limited'
-    siteUrl = 'https://aitusoftware.com'
-    sourceUrl = 'https://github.com/aitusoftware/flute'
+    siteUrl = 'https://github.com/aitusoftware/flute'
+    sourceUrl = 'git@github.com:aitusoftware/flute'
 
     javaCompilerExecutable = System.env['JAVA_HOME'] ? System.env['JAVA_HOME'] + '/bin/javac' : 'javac'
+    if (!project.hasProperty('sonatypeUrl')) sonatypeUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+    if (!project.hasProperty('sonatypeUsername')) sonatypeUsername = ''
+    if (!project.hasProperty('sonatypePassword')) sonatypePassword = ''
 }
 
 
@@ -316,3 +320,50 @@ class Version {
     }
 }
 
+def projectPom = {
+    name = fullName
+    description = fullDescription
+    url = siteUrl
+
+    scm {
+        url = "scm:$sourceUrl"
+        connection = "scm:$sourceUrl"
+    }
+
+    licenses {
+        license {
+            name = 'The Apache Software License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution = 'repo'
+        }
+    }
+
+    developers {
+        developer {
+            id = 'epickrram'
+            name = 'epickrram'
+            email = 'flute@aitusoftware.com'
+        }
+    }
+}
+
+install {
+    repositories.mavenInstaller.pom.project(projectPom)
+}
+
+signing {
+    required { gradle.taskGraph.hasTask('uploadArchives') }
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        beforeDeployment { deployment -> signing.signPom(deployment) }
+
+        repository(url: sonatypeUrl) {
+            authentication(userName: sonatypeUsername, password: sonatypePassword)
+        }
+
+        pom.project(projectPom)
+    }
+}
