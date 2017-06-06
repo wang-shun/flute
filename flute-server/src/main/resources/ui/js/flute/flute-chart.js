@@ -148,7 +148,7 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
                         (function (boundMetric, reportWindow, url, index) {
                             d3.json(url, function(data) {
 
-                                console.log(data);
+//                                console.log(data);
 
                                 globalCounters[boundMetric.getNormalisedName()]['remainingPercentileDataCount']--;
                                 var percentileData = globalCounters[boundMetric.getNormalisedName()]['percentileData'];
@@ -245,7 +245,7 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
 
         context.translate(margin.left, margin.top);
 
-        var xScale = d3.scaleLog().range([0, width]);
+        var xScale = d3.scaleLinear().range([0, width]);
         var yScale = d3.scaleLinear().range([height, 0]);
 
         var startTimestamp = Number.MAX_VALUE;
@@ -254,7 +254,6 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
         var minValue = Number.MAX_VALUE;
         for(var i = 0; i < percentileData.length; i++) {
             var percentiles = percentileData[i];
-            console.log(percentiles.start + ' -> ' + percentiles.end);
             for(var j = 0; j < percentiles.data.length; j++) {
                 maxValue = Math.max(maxValue, percentiles.data[j].max);
                 minValue = Math.min(minValue, percentiles.data[j].min);
@@ -268,17 +267,10 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
 
 
         var horizontalTickSize = 6;
-        var horizontalTicks = [1, 10, 100, 1000, 10000, 100000, 1000000, 10000000];
-        var percentileLookup = [];
-        percentileLookup[1] = '0%';
-        percentileLookup[10] = '90%';
-        percentileLookup[100] = '99%';
-        percentileLookup[1000] = '99.9%';
-        percentileLookup[10000] = '99.99%';
-        percentileLookup[100000] = '99.999%';
-        percentileLookup[1000000] = '99.9999%';
-        percentileLookup[10000000] = '99.99999%';
-        percentileLookup[100000000] = '99.999999%';
+
+        var hTickCount = Math.floor((endTimestamp - startTimestamp) / 60000);
+        var horizontalTicks = xScale.ticks(hTickCount);
+        var hTickFormat = xScale.tickFormat(hTickCount);
 
         context.beginPath();
         horizontalTicks.forEach(function(d) {
@@ -290,8 +282,9 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
 
         context.textAlign = "center";
         context.textBaseline = "top";
+        var hFormat = d3.timeFormat("%H:%M");
         horizontalTicks.forEach(function(d) {
-            context.fillText(percentileLookup[d], xScale(d), height + horizontalTickSize);
+            context.fillText(hFormat(new Date(d)), xScale(d), height + horizontalTickSize);
         });
 
         var verticalTickCount = 10;
@@ -341,7 +334,7 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
             context.beginPath();
             maxLine(percentiles.data);
             context.lineWidth = 1.5;
-//            context.strokeStyle = d3.schemeCategory10[percentiles.index];
+            context.strokeStyle = d3.schemeCategory10[0];
             context.stroke();
 
             var minLine = d3.line().x(function(d) {
@@ -352,7 +345,7 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
             context.beginPath();
             minLine(percentiles.data);
             context.lineWidth = 1.5;
-//            context.strokeStyle = d3.schemeCategory10[percentiles.index];
+            context.strokeStyle = d3.schemeCategory10[1];
             context.stroke();
 
             var meanLine = d3.line().x(function(d) {
@@ -363,7 +356,7 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
             context.beginPath();
             meanLine(percentiles.data);
             context.lineWidth = 1.5;
-//            context.strokeStyle = d3.schemeCategory10[percentiles.index];
+            context.strokeStyle = d3.schemeCategory10[2];
             context.stroke();
         }
 
