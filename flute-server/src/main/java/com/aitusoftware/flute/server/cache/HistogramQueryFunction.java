@@ -19,12 +19,11 @@ import org.HdrHistogram.Histogram;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @FunctionalInterface
 public interface HistogramQueryFunction
 {
     List<Histogram> query(
-            final long selectionStartTime, final long duration, final TimeUnit durationUnit,
-            final Set<String> identifiers, final String metricKey);
+            final Set<String> identifiers, final String metricKey, final long selectionStartTime,
+            final long selectionEndTime);
 }

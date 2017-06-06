@@ -166,11 +166,10 @@ public final class RollingWindowHistogramTest
         return currentTime;
     }
 
-    private List<Histogram> queryFunction(final long endTimestamp, final long duration, final TimeUnit timeUnit,
-                                          final Set<String> metricIdentifiers, final String metricKey)
+    private List<Histogram> queryFunction(final Set<String> metricIdentifiers, final String metricKey,
+                                          final long startTimestamp, final long endTimestamp)
     {
-        assertThat(timeUnit, is(DURATION_UNIT));
-        capturedQueryRequestTimestamp = endTimestamp;
+        capturedQueryRequestTimestamp = startTimestamp;
         queryCount++;
         return queryResponse;
     }

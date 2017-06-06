@@ -76,8 +76,8 @@ public final class TimeSeriesChartHandler extends DefaultHandler
         }
 
         final long relativeStartTime = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(5L);
-        final List<Histogram> histograms = histogramRetrievalDao.query(relativeStartTime, 0L, TimeUnit.DAYS, metricIdentifiers,
-                query.getMetricKey());
+        final List<Histogram> histograms = histogramRetrievalDao.query(metricIdentifiers, query.getMetricKey(), relativeStartTime,
+                System.currentTimeMillis());
 
         writeHistograms(histograms, response.getWriter());
 

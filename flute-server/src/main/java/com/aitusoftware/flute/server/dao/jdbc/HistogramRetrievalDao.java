@@ -35,7 +35,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.zip.DataFormatException;
 
 public final class HistogramRetrievalDao implements HistogramQueryFunction
@@ -59,11 +58,10 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
     }
 
     @Override
-    public List<Histogram> query(final long selectionStartTime, final long duration,
-                                 final TimeUnit durationUnit, final Set<String> identifiers,
-                                 final String metricKey)
+    public List<Histogram> query(final Set<String> identifiers, final String metricKey, final long selectionStartTime,
+                                 final long selectionEndTime)
     {
-        return queryForHistograms(identifiers, DETAIL_QUERY_BASE + DETAIL_QUERY_CLAUSE, selectionStartTime, System.currentTimeMillis());
+        return queryForHistograms(identifiers, DETAIL_QUERY_BASE + DETAIL_QUERY_CLAUSE, selectionStartTime, selectionEndTime);
     }
 
     public void selectCompositeHistogramSummary(final Set<String> identifiers, final Query query, final FullHistogramHandler handler)
