@@ -107,7 +107,7 @@ subprojects {
 
     group = 'com.aitusoftware'
 
-    version = new Version(major: 0, minor: 1, revision: 2)
+    version = new Version(major: 0, minor: 1, revision: 3)
 
     signing {
         required { gradle.taskGraph.hasTask('uploadArchives') }
