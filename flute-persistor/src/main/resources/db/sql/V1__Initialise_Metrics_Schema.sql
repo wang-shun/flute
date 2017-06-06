@@ -1,0 +1,17 @@
+CREATE TABLE histogram_data (
+    sender VARCHAR(64) NOT NULL,
+    identifier VARCHAR(256) NOT NULL,
+    start_timestamp BIGINT NOT NULL,
+    end_timestamp BIGINT NOT NULL,
+    min_value BIGINT NOT NULL,
+    mean DOUBLE NOT NULL,
+    fifty BIGINT NOT NULL,
+    ninety BIGINT NOT NULL,
+    two_nines BIGINT NOT NULL,
+    three_nines BIGINT NOT NULL,
+    four_nines BIGINT NOT NULL,
+    five_nines BIGINT NOT NULL,
+    max_value BIGINT NOT NULL,
+    total_count BIGINT NOT NULL,
+    raw_data BLOB,
+    PRIMARY KEY (sender, identifier, start_timestamp));

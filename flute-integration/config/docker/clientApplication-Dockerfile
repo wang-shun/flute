@@ -1,0 +1,17 @@
+FROM azul/zulu-openjdk:8
+
+WORKDIR /work
+
+COPY integration/src/test/resources/acceptance-test-flute.properties deploy/
+COPY integration/build/libs/flute-integration-all-0.1.2.jar deploy/
+COPY persistor/src/main/resources/logging/log4j.xml deploy/
+
+
+ENV CONFIG_FILE=deploy/acceptance-test-flute.properties
+
+
+CMD java -cp deploy/flute-integration-all-0.1.2.jar \
+    -Dlog4j.configuration=logging/log4j.xml \
+    -Dflute.test.acceptance.reporting.udp.address=${PERSISTOR_PORT_51001_UDP_ADDR}:${PERSISTOR_PORT_51001_UDP_PORT} \
+    -Dflute.test.acceptance.reporting.tcp.address=${PERSISTOR_PORT_51000_TCP_ADDR}:${PERSISTOR_PORT_51000_TCP_PORT} \
+    com.aitusoftware.flute.integration.client.TimingClientMain $CONFIG_FILE

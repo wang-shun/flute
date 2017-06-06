@@ -1,0 +1,124 @@
+<!--
+    Copyright 2016 Aitu Software Limited.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<html>
+<head>
+    <title>Flute SLA Reporting</title>
+    <script src="../js/vendor/d3/d3-collection.js"></script>
+    <script src="../js/vendor/d3/d3-dispatch.js"></script>
+    <script src="../js/vendor/d3/d3-dsv.js"></script>
+    <script src="../js/vendor/d3/d3-request.js"></script>
+    <script src="../js/vendor/d3/d3-selection.js"></script>
+    <link rel="stylesheet" href="../css/style.css"/>
+    <link rel="stylesheet" href="../css/vendor/bootstrap/bootstrap.min.css"/>
+</head>
+<body>
+<div class="header">
+    <span class="logo">Flute</span><span id="headerReportName"></span>
+</div>
+
+<div class="container">
+    <div class="listReportsPanel">
+    </div>
+    <div class="reportControlsMenu">
+        <button id="createReportLink" type="button" class="btn btn-default">Create new report</button>
+    </div>
+    <div class="createReportPanel">
+        <span>Report properties</span>
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label for="reportName" class="control-label col-xs-2">Name</label>
+                <div class="col-xs-10">
+                    <input type="text" id="reportName" class="form-control"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="metricPattern" class="control-label col-xs-2">Metric pattern</label>
+                <div class="col-xs-10">
+                    <input type="text" class="metricSearch form-control" id="metricPattern"/>
+                </div>
+                <div class="matchingMetrics"></div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-2">
+                    <label for="twd_0" class="control-label">Time windows</label>
+                    <br/>
+                    <button id="addTimeWindowAction" type="button" class="btn btn-default">+</button>
+                </div>
+                <div class="col-xs-10" id="timeWindowContainer">
+                    <div>
+                        <input type="text" id="twd_0" class="form-control"/>
+                        <select id="twu_0" class="form-control">
+                            <option class="U_DAYS" value="DAYS">days</option>
+                            <option class="U_HOURS" value="HOURS">hours</option>
+                            <option class="U_MINUTES" value="MINUTES">minutes</option>
+                            <option class="U_SECONDS" value="SECONDS">seconds</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label for="MAX" class="control-label col-xs-2">Max</label>
+                <div class="col-xs-10">
+                    <input type="text" id="MAX" class="form-control"/>
+                </div>
+
+                <label for="FIVE_NINES" class="control-label col-xs-2">99.999%ile</label>
+                <div class="col-xs-10">
+                    <input type="text" id="FIVE_NINES" class="form-control"/>
+                </div>
+
+                <label for="FOUR_NINES" class="control-label col-xs-2">99.99%ile</label>
+                <div class="col-xs-10">
+                    <input type="text" id="FOUR_NINES" class="form-control"/>
+                </div>
+
+                <label for="THREE_NINES" class="control-label col-xs-2">99.9%ile</label>
+                <div class="col-xs-10">
+                    <input type="text" id="THREE_NINES" class="form-control"/>
+                </div>
+
+                <label for="TWO_NINES" class="control-label col-xs-2">99%ile</label>
+                <div class="col-xs-10">
+                    <input type="text" id="TWO_NINES" class="form-control"/>
+                </div>
+
+                <label for="FIFTIETH" class="control-label col-xs-2">50%ile</label>
+                <div class="col-xs-10">
+                    <input type="text" id="FIFTIETH" class="form-control"/>
+                </div>
+
+                <label for="MEAN" class="control-label col-xs-2">Mean</label>
+                <div class="col-xs-10">
+                    <input type="text" id="MEAN" class="form-control"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <button id="createReportAction" type="button" class="btn btn-default">Create</button>
+            </div>
+            <div class="form-group" id="amendmentControls">
+                <button id="deleteReportAction" type="button" class="btn btn-default">Delete</button>
+                <input type="checkbox" id="deleteConfirmation">
+                <label for="deleteConfirmation" id="deleteConfirmationLabel" class="control-label">Check to confirm</label>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="status"></div>
+<script src="../js/flute/flute-reports.js"></script>
+<script src="../js/flute/flute-util.js"></script>
+</body>
+</html>

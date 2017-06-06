@@ -1,0 +1,114 @@
+/*
+ * Copyright 2016 Aitu Software Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.header {
+    height: 40px;
+    background: #333;
+    padding-top: 6px;
+    padding-left: 6px;
+    margin-bottom: 20px;
+}
+
+#links {
+    float: right;
+    color: #fff;
+    font-size: 18px;
+    font-family: monospace;
+    padding-right: 20px;
+}
+
+.logo {
+    color: #ff9966;
+    font-size: 18px;
+    font-family: monospace;
+}
+
+#headerReportName {
+    color: #ccc;
+    padding-left: 20px;
+    font-size: 18px;
+    font-family: monospace;
+}
+
+.thresholdExceeded {
+    background-color: #cf0000;
+    color: #fff;
+    font-weight: bold;
+    padding: 6px;
+    text-align: right;
+}
+
+.alertControl {
+    background: 1px #cc0000;
+    color: #fff;
+}
+
+.thresholdNotExceeded {
+    background-color: #00ff64;
+    color: #000;
+    padding: 6px;
+}
+
+.collapsed {
+    height: 4px;
+    background-color: #00ff64;
+}
+
+.noDataReceived {
+    background-color: #d8da64;
+}
+
+.metricContainer {
+    display: inline-block;
+    margin-right: 10px;
+    vertical-align: top;
+}
+
+.thresholdHeading {
+    padding-left: 2px;
+    text-align: right;
+}
+
+.reportWindowLabel {
+    padding-right: 2px;
+    text-align: right;
+}
+
+BODY {
+    font-family: sans-serif;
+    color: #333;
+    background-color: #efefef;
+}
+
+TH {
+    font-size: 18px;
+    text-align: left;
+}
+
+.metricTable {
+    border-spacing: 0px;
+}
+
+.createReportPanel {
+    display: none;
+}
+
+.displayNone {
+    display: none;
+}
+
+.displayBlock {
+    display: block;
+}
