@@ -248,20 +248,22 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
         var xScale = d3.scaleLog().range([0, width]);
         var yScale = d3.scaleLinear().range([height, 0]);
 
-        var maxRatio = 0;
+        var startTimestamp = Number.MAX_VALUE;
+        var endTimestamp = 0;
         var maxValue = 0;
-        var minRatio = Number.MAX_VALUE, minValue = Number.MAX_VALUE;
+        var minValue = Number.MAX_VALUE;
         for(var i = 0; i < percentileData.length; i++) {
             var percentiles = percentileData[i];
+            console.log(percentiles.start + ' -> ' + percentiles.end);
             for(var j = 0; j < percentiles.data.length; j++) {
-                maxRatio = Math.max(maxRatio, percentiles.data[j].ratio);
-                maxValue = Math.max(maxValue, percentiles.data[j].value);
-                minRatio = Math.min(minRatio, percentiles.data[j].ratio);
-                minValue = Math.min(minValue, percentiles.data[j].value);
+                maxValue = Math.max(maxValue, percentiles.data[j].max);
+                minValue = Math.min(minValue, percentiles.data[j].min);
+                startTimestamp = Math.min(startTimestamp, percentiles.data[j].start);
+                endTimestamp = Math.max(startTimestamp, percentiles.data[j].end);
             }
         }
 
-        xScale.domain([minRatio, maxRatio]);
+        xScale.domain([startTimestamp, endTimestamp]);
         yScale.domain([minValue, maxValue]);
 
 
@@ -328,71 +330,43 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
         context.fillText("Latency (us)", -10, 10);
         context.restore();
 
-        percentileData.sort(function(a, b) {
-            return a.index - b.index;
-        });
         for(var i = 0; i < percentileData.length; i++) {
             var percentiles = percentileData[i];
 
-            var line = d3.line().x(function(d) {
-                return xScale(d.ratio);
-            }).y(function(d) { return yScale(d.value); }).
+            var maxLine = d3.line().x(function(d) {
+                return xScale(d.start);
+            }).y(function(d) { return yScale(d.max); }).
             context(context);
 
             context.beginPath();
-            line(percentiles.data);
+            maxLine(percentiles.data);
             context.lineWidth = 1.5;
-            context.strokeStyle = d3.schemeCategory10[percentiles.index];
+//            context.strokeStyle = d3.schemeCategory10[percentiles.index];
+            context.stroke();
+
+            var minLine = d3.line().x(function(d) {
+                return xScale(d.start);
+            }).y(function(d) { return yScale(d.min); }).
+            context(context);
+
+            context.beginPath();
+            minLine(percentiles.data);
+            context.lineWidth = 1.5;
+//            context.strokeStyle = d3.schemeCategory10[percentiles.index];
+            context.stroke();
+
+            var meanLine = d3.line().x(function(d) {
+                return xScale(d.start);
+            }).y(function(d) { return yScale(d.mean); }).
+            context(context);
+
+            context.beginPath();
+            meanLine(percentiles.data);
+            context.lineWidth = 1.5;
+//            context.strokeStyle = d3.schemeCategory10[percentiles.index];
             context.stroke();
         }
 
-        var slaPoints = [];
-        metricThresholds.forEach(function(m) {
-            if(m.name === 'NINETIETH') {
-                slaPoints.push({x: 10, value: m.value});
-            } else if(m.name === 'TWO_NINES') {
-                slaPoints.push({x: 100, value: m.value});
-            } else if(m.name === 'THREE_NINES') {
-                slaPoints.push({x: 1000, value: m.value});
-            } else if(m.name === 'FOUR_NINES') {
-                slaPoints.push({x: 10000, value: m.value});
-            } else if(m.name === 'FIVE_NINES') {
-                slaPoints.push({x: 100000, value: m.value});
-            } else if(m.name === 'SIX_NINES') {
-                slaPoints.push({x: 1000000, value: m.value});
-            } else if(m.name === 'MIN') {
-                slaPoints.push({x: 1, value: m.value});
-            } else if(m.name === 'MAX') {
-                slaPoints.push({x: maxRatio, value: m.value});
-            }
-        });
-
-        slaPoints.sort(function(a, b) {
-            return a.x - b.x;
-        });
-        var slaIndicator = [];
-        var lastX = 1;
-        var lastY;
-
-        slaPoints.forEach(function(d) {
-            slaIndicator.push({x: lastX, value: d.value});
-            lastX = d.x;
-            slaIndicator.push({x: d.x, value: d.value});
-        });
-
-        var slaLine = d3.line().
-            x(function(d) {
-                return xScale(d.x);
-            }).y(function(d) {
-                return yScale(Math.min(d.value, maxValue));
-            }).
-            context(context);
-
-        context.beginPath();
-        slaLine(slaIndicator);
-        context.lineWidth = 1.5;
-        context.strokeStyle = '#333';
-        context.stroke();
     }
 
     function indicateNoDataForCell(normalisedName, thresholdName, reportWindowName) {
