@@ -176,7 +176,7 @@
         context.stroke();
     };
 
-    function getDataUrl(metric, reportWindow) {
+    function getDataUrl(metric, reportWindow, endTimestamp) {
         return '../../query/slaPercentiles/' +
              metric.metricName + '/' +
              reportWindow.duration + '/' +

@@ -49,12 +49,14 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
 
         var reportNameMatch = /.*(\?|&)report\=([^&]+)/.exec(window.location.search);
         var metricNameMatch = /.*(\?|&)metric\=([^&]+)/.exec(window.location.search);
+        var endTimestampMatch = /.*(\?|&)endTimestamp\=([^&]+)/.exec(window.location.search);
         if(reportNameMatch !== null) {
             reportName = reportNameMatch[2];
             fluteUtil.get('../../report/spec/' + reportName,
                 function(reportConfig) {
                     d3.selectAll('.status').text('Retrieved reporting config.');
                     d3.select('#headerReportName').text(reportName);
+                    reportConfig.endTimestamp = null;
                     currentReportConfig = reportConfig;
                     createApp(reportConfig);
                     setInterval(reloadReportConfig, 5000);
@@ -72,6 +74,7 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
             reportConfig.reportWindows.push({unit: "HOURS", duration: 1});
             reportConfig.metricThresholds = [];
             reportConfig.metricThresholds.push({metricKey: metricNameMatch[2], metrics: [{name: 'MAX', value: 1000000}]});
+            reportConfig.endTimestamp = endTimestampMatch == null ? null : endTimestampMatch[2];
 
             d3.selectAll('.status').text('Dynamic reporting config.');
             d3.select('#headerReportName').text('Dynamic');
@@ -159,7 +162,7 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
                                     reportWindow.duration + '/' +
                                     reportWindow.unit;
 
-                        var percentileUrl = chartFunctions.getDataUrl(metric, reportWindow);
+                        var percentileUrl = chartFunctions.getDataUrl(metric, reportWindow, reportingConfig.endTimestamp);
 
                         (function (boundMetric, reportWindow, url, index) {
                             d3.json(url, function(data) {

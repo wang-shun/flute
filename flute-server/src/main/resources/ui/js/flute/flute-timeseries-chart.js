@@ -142,8 +142,14 @@
         }
     };
 
-    function getDataUrl(metric, reportWindow) {
-        return '../../query/timeSeries/' + metric.metricName + '/5/MINUTES';
+    function getDataUrl(metric, reportWindow, endTimestamp) {
+        var url = '../../query/timeSeries/' + metric.metricName +
+            '/' + reportWindow.duration + '/' + reportWindow.unit;
+        if(endTimestamp !== undefined && endTimestamp !== null) {
+            url += '/' + endTimestamp;
+        }
+
+        return url;
     }
 
     this.chartFunctions = {
