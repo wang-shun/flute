@@ -48,6 +48,7 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
         d3.selectAll('.status').text('No report specified.');
 
         var reportNameMatch = /.*(\?|&)report\=([^&]+)/.exec(window.location.search);
+        var metricNameMatch = /.*(\?|&)metric\=([^&]+)/.exec(window.location.search);
         if(reportNameMatch !== null) {
             reportName = reportNameMatch[2];
             fluteUtil.get('../../report/spec/' + reportName,
@@ -63,6 +64,20 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
                 }
             );
             reportMode = true;
+        } else if(metricNameMatch !== null) {
+            var reportConfigArray = [];
+            var reportConfig = {};
+            reportConfig.unit = 'MICROSECONDS';
+            reportConfig.reportWindows = [];
+            reportConfig.reportWindows.push({unit: "HOURS", duration: 1});
+            reportConfig.metricThresholds = [];
+            reportConfig.metricThresholds.push({metricKey: metricNameMatch[2], metrics: [{name: 'MAX', value: 1000000}]});
+
+            d3.selectAll('.status').text('Dynamic reporting config.');
+            d3.select('#headerReportName').text('Dynamic');
+            reportConfigArray.push(reportConfig);
+            currentReportConfig = reportConfigArray;
+            createApp(reportConfigArray);
         }
     }
 
@@ -80,6 +95,8 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
     }
 
     function createApp(reportingConfig) {
+        console.log(reportingConfig);
+
         var fluteApplication = configureApplication(reportingConfig);
         var view = createView();
         view.layout(fluteApplication.getMetrics(),
