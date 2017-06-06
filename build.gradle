@@ -319,6 +319,18 @@ project(':common') {
         compile 'org.flywaydb:flyway-core:4.0', 'com.h2database:h2:1.4.191'
         compile 'org.hdrhistogram:HdrHistogram:2.1.8'
     }
+
+    uploadArchives {
+        repositories.mavenDeployer {
+            beforeDeployment { deployment -> signing.signPom(deployment) }
+
+            repository(url: sonatypeUrl) {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project(projectPom)
+        }
+    }
 }
 
 project(':persistor') {
@@ -410,6 +422,6 @@ install {
 }
 
 task uploadAllArchives {
-    dependsOn 'server:uploadArchives', 'client:uploadArchives',
+    dependsOn 'server:uploadArchives', 'client:uploadArchives', 'common:uploadArchives',
             'persistor:uploadArchives', 'agent:uploadArchives'
 }
