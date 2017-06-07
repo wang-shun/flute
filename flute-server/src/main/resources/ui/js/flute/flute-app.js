@@ -69,11 +69,14 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
         } else if(metricNameMatch !== null) {
             var reportConfigArray = [];
             var reportConfig = {};
+            var metricsArray = metricNameMatch[2].split(',');
             reportConfig.unit = 'MICROSECONDS';
             reportConfig.reportWindows = [];
             reportConfig.reportWindows.push({unit: "HOURS", duration: 1});
             reportConfig.metricThresholds = [];
-            reportConfig.metricThresholds.push({metricKey: metricNameMatch[2], metrics: [{name: 'MAX', value: 1000000}]});
+            for(var m = 0; m < metricsArray.length; m++) {
+                reportConfig.metricThresholds.push({metricKey: metricsArray[m], metrics: [{name: 'MAX', value: 1000000}]});
+            }
             reportConfig.endTimestamp = endTimestampMatch == null ? null : endTimestampMatch[2];
 
             d3.selectAll('.status').text('Dynamic reporting config.');
@@ -98,8 +101,6 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
     }
 
     function createApp(reportingConfig) {
-        console.log(reportingConfig);
-
         var fluteApplication = configureApplication(reportingConfig);
         var view = createView();
         view.layout(fluteApplication.getMetrics(),

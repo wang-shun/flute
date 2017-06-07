@@ -18,7 +18,7 @@
         var metricNormalisedName = boundMetric.getNormalisedName();
         var metricThresholds = boundMetric.getMetricThresholds();
 
-        var canvas = d3.select('#percentile_chart_' + metricNormalisedName).attr('width', '800').attr('height', '300');
+        var canvas = d3.select('#percentile_chart_' + metricNormalisedName).attr('width', '400').attr('height', '300');
         var context = canvas.node().getContext('2d');
         var margin = {top: 20, right: 20, bottom: 30, left: 50},
             width = canvas.node().width - margin.left - margin.right,
@@ -116,28 +116,6 @@
             maxLine(percentiles.data);
             context.lineWidth = 1.5;
             context.strokeStyle = d3.schemeCategory10[0];
-            context.stroke();
-
-            var minLine = d3.line().x(function(d) {
-                return xScale(d.start);
-            }).y(function(d) { return yScale(d.min); }).
-            context(context);
-
-            context.beginPath();
-            minLine(percentiles.data);
-            context.lineWidth = 1.5;
-            context.strokeStyle = d3.schemeCategory10[1];
-            context.stroke();
-
-            var meanLine = d3.line().x(function(d) {
-                return xScale(d.start);
-            }).y(function(d) { return yScale(d.mean); }).
-            context(context);
-
-            context.beginPath();
-            meanLine(percentiles.data);
-            context.lineWidth = 1.5;
-            context.strokeStyle = d3.schemeCategory10[2];
             context.stroke();
         }
     };
