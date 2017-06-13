@@ -50,6 +50,8 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
         var reportNameMatch = /.*(\?|&)report\=([^&]+)/.exec(window.location.search);
         var metricNameMatch = /.*(\?|&)metric\=([^&]+)/.exec(window.location.search);
         var endTimestampMatch = /.*(\?|&)endTimestamp\=([^&]+)/.exec(window.location.search);
+        var reportWindowUnitMatch = /.*(\?|&)reportWindowUnit\=([^&]+)/.exec(window.location.search);
+        var reportWindowDurationMatch = /.*(\?|&)reportWindowDuration\=([^&]+)/.exec(window.location.search);
         if(reportNameMatch !== null) {
             reportName = reportNameMatch[2];
             fluteUtil.get('../../report/spec/' + reportName,
@@ -71,8 +73,15 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
             var reportConfig = {};
             var metricsArray = metricNameMatch[2].split(',');
             reportConfig.unit = 'MICROSECONDS';
+            var reportWindow = {unit: "MINUTES", duration: 5};
+            if (reportWindowUnitMatch !== null) {
+                reportWindow.unit = reportWindowUnitMatch[2];
+            }
+            if (reportWindowDurationMatch !== null) {
+                reportWindow.duration = reportWindowDurationMatch[2];
+            }
             reportConfig.reportWindows = [];
-            reportConfig.reportWindows.push({unit: "HOURS", duration: 1});
+            reportConfig.reportWindows.push(reportWindow);
             reportConfig.metricThresholds = [];
             for(var m = 0; m < metricsArray.length; m++) {
                 reportConfig.metricThresholds.push({metricKey: metricsArray[m], metrics: [{name: 'MAX', value: 1000000}]});
