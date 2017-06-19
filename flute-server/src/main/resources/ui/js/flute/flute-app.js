@@ -172,7 +172,7 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
                                     reportWindow.duration + '/' +
                                     reportWindow.unit;
 
-                        var percentileUrl = chartFunctions.getDataUrl(metric, reportWindow, reportingConfig.endTimestamp);
+                        var percentileUrl = chartFunctions.getDataUrl(metric, reportWindow, reportingConfig[0].endTimestamp);
 
                         (function (boundMetric, reportWindow, url, index) {
                             d3.json(url, function(data) {
