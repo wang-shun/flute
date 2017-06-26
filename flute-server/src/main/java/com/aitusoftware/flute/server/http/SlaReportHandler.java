@@ -18,7 +18,6 @@ package com.aitusoftware.flute.server.http;
 import com.aitusoftware.flute.server.cache.HistogramCache;
 import com.aitusoftware.flute.server.dao.jdbc.HistogramRetrievalDao;
 import com.aitusoftware.flute.server.dao.jdbc.MetricIdentifierDao;
-import com.aitusoftware.flute.server.query.FullHistogramHandler;
 import com.aitusoftware.flute.server.query.Query;
 import org.HdrHistogram.Histogram;
 import org.eclipse.jetty.server.Request;
@@ -86,7 +85,7 @@ public final class SlaReportHandler extends DefaultHandler
         }
         else
         {
-            histogramRetrievalDao.selectCompositeHistogramSummary(metricIdentifiers, query, new HistogramSummaryHandler(writer));
+            histogramRetrievalDao.selectCompositeHistogramSummary(metricIdentifiers, query, new StandardPercentilesHistogramSummaryHandler(writer));
         }
         writer.append("]");
         response.setStatus(HttpServletResponse.SC_OK);
@@ -102,45 +101,6 @@ public final class SlaReportHandler extends DefaultHandler
     {
         final Histogram histogram = histogramCache.getCurrentHistogram(metricIdentifiers,
                 query.getDuration(), query.getDurationUnit(), metricKey);
-        new HistogramSummaryHandler(writer).onRecord(query.getMetricKey(), histogram.getStartTimeStamp(), histogram);
-    }
-
-    private static class HistogramSummaryHandler implements FullHistogramHandler
-    {
-        private final PrintWriter writer;
-        private boolean firstRecord;
-
-        HistogramSummaryHandler(final PrintWriter writer)
-        {
-            this.writer = writer;
-            firstRecord = true;
-        }
-
-        @Override
-        public void onRecord(final String identifier, final long timestamp, final Histogram histogram)
-        {
-
-            if (firstRecord)
-            {
-                firstRecord = false;
-            }
-            else
-            {
-                writer.append(",");
-            }
-            writer.append("[");
-            writer.append(Long.toString(timestamp)).append(",");
-            writer.append(Long.toString(histogram.getMinValue())).append(',');
-            writer.append(Double.toString(histogram.getMean())).append(',');
-            writer.append(Long.toString(histogram.getValueAtPercentile(99d))).append(',');
-            writer.append(Long.toString(histogram.getValueAtPercentile(50d))).append(',');
-            writer.append(Long.toString(histogram.getValueAtPercentile(90d))).append(',');
-            writer.append(Long.toString(histogram.getValueAtPercentile(99.9d))).append(',');
-            writer.append(Long.toString(histogram.getValueAtPercentile(99.99d))).append(',');
-            writer.append(Long.toString(histogram.getValueAtPercentile(99.999d))).append(',');
-            writer.append(Long.toString(histogram.getMaxValue())).append(',');
-            writer.append(Long.toString(histogram.getTotalCount()));
-            writer.append("]");
-        }
+        new StandardPercentilesHistogramSummaryHandler(writer).onRecord(query.getMetricKey(), histogram.getStartTimeStamp(), histogram);
     }
 }

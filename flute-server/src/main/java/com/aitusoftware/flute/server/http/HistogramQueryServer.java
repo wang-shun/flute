@@ -96,6 +96,7 @@ public final class HistogramQueryServer
 
             addContextHandler(handlers, "/flute/query/slaReport", new SlaReportHandler(histogramRetrievalDao, metricIdentifierDao, false, histogramConfig.asSupplier()));
             addContextHandler(handlers, "/flute/query/slaPercentiles", new SlaPercentileChartHandler(histogramRetrievalDao, metricIdentifierDao, false, histogramConfig.asSupplier()));
+            addContextHandler(handlers, "/flute/query/standardPercentiles", new SlaStandardPercentilesHandler(histogramRetrievalDao, metricIdentifierDao, false, histogramConfig.asSupplier()));
             addContextHandler(handlers, "/flute/query/timeSeries", new TimeSeriesChartHandler(histogramRetrievalDao, metricIdentifierDao, false));
             addContextHandler(handlers, "/flute/query/aggregator", new SlaReportHandler(histogramRetrievalDao, metricIdentifierDao, true, histogramConfig.asSupplier()));
             addContextHandler(handlers, "/flute/query/metricSearch", new MetricIdentifierSearchHandler(metricIdentifierDao));

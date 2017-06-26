@@ -18,11 +18,8 @@ package com.aitusoftware.flute.server.http;
 import com.aitusoftware.flute.server.cache.HistogramCache;
 import com.aitusoftware.flute.server.dao.jdbc.HistogramRetrievalDao;
 import com.aitusoftware.flute.server.dao.jdbc.MetricIdentifierDao;
-import com.aitusoftware.flute.server.query.FullHistogramHandler;
 import com.aitusoftware.flute.server.query.Query;
 import org.HdrHistogram.Histogram;
-import org.HdrHistogram.HistogramIterationValue;
-import org.HdrHistogram.PercentileIterator;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 
@@ -35,19 +32,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import static java.lang.String.format;
 import static java.util.Collections.singleton;
 
-public final class SlaPercentileChartHandler extends DefaultHandler
+public final class SlaStandardPercentilesHandler extends DefaultHandler
 {
     private final HistogramRetrievalDao histogramRetrievalDao;
     private final MetricIdentifierDao metricIdentifierDao;
     private final boolean isAggregator;
     private final HistogramCache histogramCache;
 
-    public SlaPercentileChartHandler(final HistogramRetrievalDao histogramRetrievalDao,
-                                     final MetricIdentifierDao metricIdentifierDao,
-                                     final boolean isAggregator, final Supplier<Histogram> histogramSupplier)
+    public SlaStandardPercentilesHandler(final HistogramRetrievalDao histogramRetrievalDao,
+                                         final MetricIdentifierDao metricIdentifierDao,
+                                         final boolean isAggregator, final Supplier<Histogram> histogramSupplier)
     {
         this.histogramRetrievalDao = histogramRetrievalDao;
         this.metricIdentifierDao = metricIdentifierDao;
@@ -74,7 +70,6 @@ public final class SlaPercentileChartHandler extends DefaultHandler
         final Set<String> metricIdentifiers;
         if(isAggregator)
         {
-
             metricIdentifiers = metricIdentifierDao.getIdentifiersMatching(query.getMetricKey());
         }
         else
@@ -89,10 +84,8 @@ public final class SlaPercentileChartHandler extends DefaultHandler
         else
         {
             histogramRetrievalDao.selectCompositeHistogram(metricIdentifiers,
-                    query, new PercentileHistogramHandler(writer));
+                    query, new StandardPercentilesHistogramSummaryHandler(writer));
         }
-
-
 
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
@@ -107,61 +100,6 @@ public final class SlaPercentileChartHandler extends DefaultHandler
     {
         final Histogram histogram = histogramCache.getCurrentHistogram(metricIdentifiers,
                 query.getDuration(), query.getDurationUnit(), metricKey);
-        new PercentileHistogramHandler(writer).onRecord(query.getMetricKey(), histogram.getStartTimeStamp(), histogram);
-    }
-
-    private static class PercentileHistogramHandler implements FullHistogramHandler
-    {
-        private final PrintWriter writer;
-
-        PercentileHistogramHandler(final PrintWriter writer)
-        {
-            this.writer = writer;
-        }
-
-        @Override
-        public void onRecord(final String identifier, final long timestamp, final Histogram histogram)
-        {
-            final int numberOfSignificantValueDigits = histogram.getNumberOfSignificantValueDigits();
-            final PercentileIterator iterator = new PercentileIterator(histogram, 5);
-            writer.append("[");
-            boolean first = true;
-            while (iterator.hasNext())
-            {
-                final HistogramIterationValue iterationValue = iterator.next();
-                final boolean isMaxEntry = iterationValue.getPercentileLevelIteratedTo() == 100.0D;
-
-                if(isMaxEntry)
-                {
-                    continue;
-                }
-
-                if(first)
-                {
-                    first = false;
-                }
-                else
-                {
-                    writer.append(',');
-                }
-                writer.append('{');
-
-
-                ReportingConfigSerialiser.appendValue("value", format("%." + numberOfSignificantValueDigits + "f", (double) iterationValue.getValueIteratedTo()), false, writer);
-                writer.append(',');
-                ReportingConfigSerialiser.appendValue("percentile", format("%2.12f", iterationValue.getPercentileLevelIteratedTo()/100.0D), false, writer);
-                writer.append(',');
-                ReportingConfigSerialiser.appendValue("total", Long.toString(iterationValue.getTotalCountToThisValue()), false, writer);
-                writer.append(',');
-
-
-                final double ratio = 1 / (1.0D - (iterationValue.getPercentileLevelIteratedTo() / 100.0D));
-                ReportingConfigSerialiser.appendValue("ratio",
-                        format("%.2f", ratio), false, writer);
-                writer.append('}');
-            }
-
-            writer.append("]");
-        }
+        new StandardPercentilesHistogramSummaryHandler(writer).onRecord(query.getMetricKey(), histogram.getStartTimeStamp(), histogram);
     }
 }
