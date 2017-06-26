@@ -22,13 +22,36 @@ import java.io.PrintWriter;
 
 class StandardPercentilesHistogramSummaryHandler implements FullHistogramHandler
 {
+    private enum Format
+    {
+        CSV,
+        JSON;
+    }
+
+    private final Format format;
     private final PrintWriter writer;
     private boolean firstRecord;
 
-    StandardPercentilesHistogramSummaryHandler(final PrintWriter writer)
+    static StandardPercentilesHistogramSummaryHandler csv(final PrintWriter writer)
+    {
+        return new StandardPercentilesHistogramSummaryHandler(writer, Format.CSV);
+    }
+
+    static StandardPercentilesHistogramSummaryHandler json(final PrintWriter writer)
+    {
+        return new StandardPercentilesHistogramSummaryHandler(writer, Format.JSON);
+    }
+
+    private StandardPercentilesHistogramSummaryHandler(final PrintWriter writer, final Format format)
     {
         this.writer = writer;
+        this.format = format;
         firstRecord = true;
+    }
+
+    StandardPercentilesHistogramSummaryHandler(final PrintWriter writer)
+    {
+        this(writer, Format.JSON);
     }
 
     @Override
@@ -41,9 +64,28 @@ class StandardPercentilesHistogramSummaryHandler implements FullHistogramHandler
         }
         else
         {
-            writer.append(",");
+            switch (format)
+            {
+                case CSV:
+                    writer.append("\n");
+                    break;
+                case JSON:
+                    writer.append(",");
+                    break;
+                default:
+                    throw new IllegalArgumentException();
+            }
         }
-        writer.append("[");
+        switch (format)
+        {
+            case JSON:
+                writer.append("[");
+                break;
+            case CSV:
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
         writer.append(Long.toString(timestamp)).append(",");
         writer.append(Long.toString(histogram.getMinValue())).append(',');
         writer.append(Double.toString(histogram.getMean())).append(',');
@@ -55,6 +97,15 @@ class StandardPercentilesHistogramSummaryHandler implements FullHistogramHandler
         writer.append(Long.toString(histogram.getValueAtPercentile(99.999d))).append(',');
         writer.append(Long.toString(histogram.getMaxValue())).append(',');
         writer.append(Long.toString(histogram.getTotalCount()));
-        writer.append("]");
+        switch (format)
+        {
+            case JSON:
+                writer.append("]");
+                break;
+            case CSV:
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 }

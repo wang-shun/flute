@@ -34,16 +34,16 @@ import java.util.function.Supplier;
 
 import static java.util.Collections.singleton;
 
-public final class SlaStandardPercentilesHandler extends DefaultHandler
+public final class CsvStandardPercentilesHandler extends DefaultHandler
 {
     private final HistogramRetrievalDao histogramRetrievalDao;
     private final MetricIdentifierDao metricIdentifierDao;
     private final boolean isAggregator;
     private final HistogramCache histogramCache;
 
-    public SlaStandardPercentilesHandler(final HistogramRetrievalDao histogramRetrievalDao,
-                                         final MetricIdentifierDao metricIdentifierDao,
-                                         final boolean isAggregator, final Supplier<Histogram> histogramSupplier)
+    CsvStandardPercentilesHandler(final HistogramRetrievalDao histogramRetrievalDao,
+                                  final MetricIdentifierDao metricIdentifierDao,
+                                  final boolean isAggregator, final Supplier<Histogram> histogramSupplier)
     {
         this.histogramRetrievalDao = histogramRetrievalDao;
         this.metricIdentifierDao = metricIdentifierDao;
@@ -54,7 +54,7 @@ public final class SlaStandardPercentilesHandler extends DefaultHandler
     @Override
     public void handle(final String target, final Request baseRequest, final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException
     {
-        response.setContentType("application/javascript; charset=utf-8");
+        response.setContentType("text/csv; charset=utf-8");
         final Optional<Query> parseResult = QueryParser.parseQuery(request.getPathInfo());
 
         if(!parseResult.isPresent())
@@ -84,7 +84,7 @@ public final class SlaStandardPercentilesHandler extends DefaultHandler
         else
         {
             histogramRetrievalDao.selectCompositeHistogram(metricIdentifiers,
-                    query, new StandardPercentilesHistogramSummaryHandler(writer));
+                    query, StandardPercentilesHistogramSummaryHandler.csv(writer));
         }
 
         response.setStatus(HttpServletResponse.SC_OK);
@@ -100,6 +100,6 @@ public final class SlaStandardPercentilesHandler extends DefaultHandler
     {
         final Histogram histogram = histogramCache.getCurrentHistogram(metricIdentifiers,
                 query.getDuration(), query.getDurationUnit(), metricKey);
-        new StandardPercentilesHistogramSummaryHandler(writer).onRecord(query.getMetricKey(), histogram.getStartTimeStamp(), histogram);
+        StandardPercentilesHistogramSummaryHandler.csv(writer).onRecord(query.getMetricKey(), histogram.getStartTimeStamp(), histogram);
     }
 }
