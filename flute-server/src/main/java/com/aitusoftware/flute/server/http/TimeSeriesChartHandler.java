@@ -21,6 +21,8 @@ import com.aitusoftware.flute.server.query.Query;
 import org.HdrHistogram.Histogram;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,11 +37,13 @@ import static java.util.Collections.singleton;
 
 public final class TimeSeriesChartHandler extends DefaultHandler
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimeSeriesChartHandler.class);
+
     private final HistogramRetrievalDao histogramRetrievalDao;
     private final MetricIdentifierDao metricIdentifierDao;
     private final boolean isAggregator;
 
-    public TimeSeriesChartHandler(final HistogramRetrievalDao histogramRetrievalDao,
+    TimeSeriesChartHandler(final HistogramRetrievalDao histogramRetrievalDao,
                                   final MetricIdentifierDao metricIdentifierDao,
                                   final boolean isAggregator)
     {
@@ -62,6 +66,11 @@ public final class TimeSeriesChartHandler extends DefaultHandler
         }
         final Query query = parseResult.get();
 
+        if(LOGGER.isDebugEnabled())
+        {
+            LOGGER.debug("Query: {}", query);
+        }
+
         final PrintWriter writer = response.getWriter();
 
         final Set<String> metricIdentifiers;
@@ -76,6 +85,11 @@ public final class TimeSeriesChartHandler extends DefaultHandler
 
         final List<Histogram> histograms = histogramRetrievalDao.query(metricIdentifiers, query.getMetricKey(),
                 query.getStartMillis(), query.getEndMillis());
+
+        if(LOGGER.isDebugEnabled())
+        {
+            LOGGER.debug("Retrieved {} histograms", histograms.size());
+        }
 
         writeHistograms(histograms, response.getWriter());
 

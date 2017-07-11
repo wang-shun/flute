@@ -15,6 +15,8 @@
  */
 package com.aitusoftware.flute.server.query;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public final class Query
@@ -80,5 +82,17 @@ public final class Query
     public boolean hasExplicitEndTime()
     {
         return endMillis != NO_EXPLICIT_END;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Query{" +
+                "metricKey='" + metricKey + '\'' +
+                ", startMillis=" + Instant.ofEpochMilli(getStartMillis()) +
+                ", endMillis=" + Instant.ofEpochMilli(endMillis) +
+                ", duration=" + duration +
+                ", durationUnit=" + durationUnit +
+                '}';
     }
 }

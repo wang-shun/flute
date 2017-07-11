@@ -22,6 +22,8 @@ import com.aitusoftware.flute.server.dao.HistogramAggregator;
 import com.aitusoftware.flute.server.query.FullHistogramHandler;
 import com.aitusoftware.flute.server.query.Query;
 import org.HdrHistogram.Histogram;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +34,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -39,9 +43,11 @@ import java.util.zip.DataFormatException;
 
 public final class HistogramRetrievalDao implements HistogramQueryFunction
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HistogramRetrievalDao.class);
     private static final String DETAIL_QUERY_BASE = "SELECT * FROM histogram_data ";
     private static final String DETAIL_QUERY_CLAUSE =
             "WHERE identifier IN (%s) AND start_timestamp >= ? AND start_timestamp <= ?";
+    private static final String DEBUG_QUERY = "SELECT * FROM histogram_data WHERE identifier IN (%s)";
     private static final ThreadLocal<ByteBuffer> BUFFER = new ThreadLocal<>();
     private final ConnectionFactory connectionFactory;
     private final int maxEncodedHistogramSize;
@@ -104,10 +110,12 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
             }
             final ByteBuffer buffer = BUFFER.get();
             final List<Histogram> resultList = new ArrayList<>();
+            boolean noResults = true;
             try
             {
                 while (resultSet.next())
                 {
+                    noResults = false;
                     try (final InputStream histogramDataStream = resultSet.getBinaryStream("raw_data"))
                     {
                         buffer.clear();
@@ -130,6 +138,11 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
 
                 }
 
+                if (noResults)
+                {
+                    logDataTimestamps(DEBUG_QUERY, identifiers, connection);
+                }
+
                 return resultList;
             }
             catch (final SQLException e)
@@ -140,6 +153,26 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
         catch (SQLException e)
         {
             throw new RuntimeException("Query failed", e);
+        }
+    }
+
+    private void logDataTimestamps(final String sql, final Set<String> identifiers, final Connection connection)
+            throws SQLException
+    {
+        try (final Statement statement = connection.createStatement();
+                final ResultSet resultSet = statement.executeQuery(String.format(sql, identifierList(identifiers))))
+        {
+            while (resultSet.next())
+            {
+                if (LOGGER.isDebugEnabled())
+                {
+                    LOGGER.debug("Found data for {}, from {} to {}, total {}",
+                            resultSet.getString("identifier"),
+                            Instant.ofEpochMilli(resultSet.getLong("start_timestamp")),
+                            Instant.ofEpochMilli(resultSet.getLong("end_timestamp")),
+                            resultSet.getLong("total_count"));
+                }
+            }
         }
     }
 
@@ -173,10 +206,18 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
             final long startMillis,
             final long endMillis) throws SQLException
     {
+        final String format = String.format(sql, identifierList(identifiers));
         final PreparedStatement preparedStatement =
-                connection.prepareStatement(String.format(sql, identifierList(identifiers)));
+                connection.prepareStatement(format);
         preparedStatement.setLong(1, startMillis);
         preparedStatement.setLong(2, endMillis);
+
+        if(LOGGER.isDebugEnabled())
+        {
+            LOGGER.debug("Query: {}, start {}, end {}, delta {}", format,
+                    Instant.ofEpochMilli(startMillis), Instant.ofEpochMilli(endMillis), endMillis - startMillis);
+        }
+
         return preparedStatement;
     }
 
