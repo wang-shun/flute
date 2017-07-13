@@ -22,7 +22,7 @@ public final class DatabaseServerMain
 {
     public static void main(final String[] args) throws Exception
     {
-        final Server server = new Server(new TcpServer(), "-tcp", "-tcpAllowOthers", "-baseDir", args[0]);
+        final Server server = new Server(new TcpServer(), "-tcp", "-tcpAllowOthers", "-baseDir", args[0], "-trace");
         server.start();
         server.shutdown();
     }

@@ -75,6 +75,11 @@ public final class HistogramConnectionHandler
                 LOGGER.error("Failed to open selector, exiting", e);
                 exceptionConsumer.accept(e);
             }
+            catch (final RuntimeException e)
+            {
+                LOGGER.error("Unexpected exception", e);
+                exceptionConsumer.accept(e);
+            }
         }
     }
 

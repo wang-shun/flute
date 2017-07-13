@@ -15,6 +15,8 @@
  */
 package com.aitusoftware.flute.exchanger;
 
+import java.util.Date;
+
 /**
  * Describes a start and end time in epoch milliseconds.
  */
@@ -37,5 +39,14 @@ public final class TimeWindow
     public long getWindowEnd()
     {
         return windowEnd;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "TimeWindow{" +
+                "windowStart=" + new Date(windowStart) +
+                ", windowEnd=" + new Date(windowEnd) +
+                '}';
     }
 }

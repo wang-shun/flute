@@ -59,11 +59,12 @@ public final class FluteMetricsPersistor
 
     public void start()
     {
+        new ManagedDatabase().init(new FlywayProperties(databaseConfig).getProperties());
         final ConnectionFactory connectionFactory = new ConnectionFactory(databaseConfig);
         final HistogramInsertDao insertDao = new HistogramInsertDao(connectionFactory.getConnection(),
                 persistenceExceptionConsumer, ONE_MEGABYTE);
 
-        new ManagedDatabase().init(new FlywayProperties(databaseConfig).getProperties());
+
         try
         {
             final ReceiverProcess tcpReceiverProcess = new HistogramReceiverFactory().
