@@ -33,6 +33,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public final class HistogramConnectionHandler
@@ -44,6 +46,7 @@ public final class HistogramConnectionHandler
     private final ExecutorService executorService;
     private final HistogramHandler histogramHandler;
     private final AtomicBoolean running = new AtomicBoolean(false);
+    private final AtomicInteger connectedSockets = new AtomicInteger(0);
 
     HistogramConnectionHandler(
             final ServerSocketChannel serverSocketChannel,
@@ -67,7 +70,8 @@ public final class HistogramConnectionHandler
             try
             {
                 final Selector selector = Selector.open();
-                executorService.submit(new InboundDataProcessor(running, selector, exceptionConsumer));
+                executorService.submit(
+                        new InboundDataProcessor(running, selector, exceptionConsumer, this::closeQuietly));
                 acceptIncomingConnections(selector);
             }
             catch (final IOException e)
@@ -93,6 +97,8 @@ public final class HistogramConnectionHandler
 
                 clientChannel.configureBlocking(false);
                 clientChannel.register(selector, SelectionKey.OP_READ, new StreamingHistogramReceiver(histogramHandler, highestTrackableValue));
+                connectedSockets.incrementAndGet();
+                System.out.printf("Connected sockets: %s%n", connectedSockets.get());
             }
             catch (final Exception e)
             {
@@ -106,13 +112,16 @@ public final class HistogramConnectionHandler
         private final AtomicBoolean running;
         private final Selector selector;
         private final Consumer<Exception> exceptionConsumer;
+        private final BiConsumer<SelectionKey, SelectableChannel> closeFunction;
 
         InboundDataProcessor(final AtomicBoolean running, final Selector selector,
-                             final Consumer<Exception> exceptionConsumer)
+                             final Consumer<Exception> exceptionConsumer,
+                             final BiConsumer<SelectionKey, SelectableChannel> closeFunction)
         {
             this.running = running;
             this.selector = selector;
             this.exceptionConsumer = exceptionConsumer;
+            this.closeFunction = closeFunction;
         }
 
         @Override
@@ -155,12 +164,12 @@ public final class HistogramConnectionHandler
                         {
                             LOGGER.debug("Inbound connection was closed: {}", ((SocketChannel) channel).getRemoteAddress());
                         }
-                        closeQuietly(selectedKey, channel);
+                        closeFunction.accept(selectedKey, channel);
                     }
                 }
                 catch (final Exception e)
                 {
-                    closeQuietly(selectedKey, channel);
+                    closeFunction.accept(selectedKey, channel);
                     exceptionConsumer.accept(e);
                 }
                 finally
@@ -176,14 +185,7 @@ public final class HistogramConnectionHandler
             {
                 selector.keys().forEach(s ->
                 {
-                    try
-                    {
-                        s.channel().close();
-                    }
-                    catch (IOException e)
-                    {
-                        // ignore
-                    }
+                    closeFunction.accept(s, s.channel());
                 });
                 selector.close();
             }
@@ -194,7 +196,7 @@ public final class HistogramConnectionHandler
         }
     }
 
-    private static void closeQuietly(final SelectionKey selectedKey, final SelectableChannel channel)
+    private void closeQuietly(final SelectionKey selectedKey, final SelectableChannel channel)
     {
         selectedKey.cancel();
         try
@@ -205,6 +207,12 @@ public final class HistogramConnectionHandler
         {
             // ignore
         }
+        connectedSockets.decrementAndGet();
+    }
+
+    public int getConnectedSocketCount()
+    {
+        return connectedSockets.get();
     }
 
     public void stop()

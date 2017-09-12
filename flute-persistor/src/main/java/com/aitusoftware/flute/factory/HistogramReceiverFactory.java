@@ -30,6 +30,7 @@ public final class HistogramReceiverFactory
     private HistogramHandler histogramHandler;
     private long highestTrackableValue;
     private ExecutorService executorService;
+    private HistogramConnectionHandler connectionHandler;
 
     public HistogramReceiverFactory withExecutor(final ExecutorService executorService)
     {
@@ -61,10 +62,15 @@ public final class HistogramReceiverFactory
         return this;
     }
 
+    public HistogramConnectionHandler connectionHandler()
+    {
+        return connectionHandler;
+    }
+
     public ReceiverProcess create() throws IOException
     {
         serverSocketChannel.configureBlocking(true);
-        final HistogramConnectionHandler connectionHandler =
+        connectionHandler =
                 new HistogramConnectionHandler(serverSocketChannel, exceptionConsumer, highestTrackableValue,
                         executorService, histogramHandler);
         return new ReceiverProcess(connectionHandler, executorService);

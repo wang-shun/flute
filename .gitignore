@@ -9,4 +9,11 @@ persistor/build
 *.iml
 MANIFEST.MF
 todo.txt
+flute-acceptance/out/
+flute-agent/out/
+flute-client/out/
+flute-common/out/
+flute-integration/out/
+flute-persistor/out/
+flute-server/out/
 

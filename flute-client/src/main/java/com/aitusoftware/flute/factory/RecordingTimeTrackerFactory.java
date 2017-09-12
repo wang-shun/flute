@@ -157,6 +157,16 @@ public class RecordingTimeTrackerFactory
     }
 
     /**
+     * Destroys all time tracker resources (sockets, histograms).
+     *
+     * Should be called when tracking is no longer required, but JVM will continue running.
+     */
+    public void shutdown()
+    {
+
+    }
+
+    /**
      * Creates, using the provided properties a TimeTracker instance
      * @return the TimeTracker
      */
@@ -171,6 +181,7 @@ public class RecordingTimeTrackerFactory
             }
         }
 
+        // TODO identify stoppable components & retain reference
         final Sender sender = new AggregatingDataSender(4194304, 524288);
         final HistogramPublisher histogramPublisher = new HistogramPublisher(sender, identifier, aggregatorEvents);
         final Supplier<Histogram> histogramSupplier;

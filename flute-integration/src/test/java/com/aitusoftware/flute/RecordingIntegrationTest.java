@@ -17,6 +17,7 @@ package com.aitusoftware.flute;
 
 import com.aitusoftware.flute.config.FluteThreadFactory;
 import com.aitusoftware.flute.config.HistogramConfig;
+import com.aitusoftware.flute.factory.HistogramConnectionHandler;
 import com.aitusoftware.flute.factory.HistogramReceiverFactory;
 import com.aitusoftware.flute.factory.RecordingTimeTrackerFactory;
 import com.aitusoftware.flute.receive.ReceiverProcess;
@@ -26,6 +27,7 @@ import org.HdrHistogram.Histogram;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -66,6 +68,8 @@ public class RecordingIntegrationTest
     private final List<Histogram> receivedList = new CopyOnWriteArrayList<>();
     private ServerSocketChannel serverSocketChannel;
     private String identifier;
+    private HistogramConnectionHandler connectionHandler;
+    private RecordingTimeTrackerFactory timeTrackerFactory;
 
     @Before
     public void before() throws Exception
@@ -117,6 +121,41 @@ public class RecordingIntegrationTest
         assertTrue(errorMessage(receiveExceptions), receivedList.size() >= 2);
         assertTrue(getTotalValueCount(receivedList) > 1);
         assertThat(sendExceptions.isEmpty(), is(true));
+    }
+
+    @Ignore("Test for #5")
+    @Test
+    public void shouldShutdownTimeTrackerConnections() throws Exception
+    {
+        final TimeTracker timeTracker = createTimeTracker(identifier);
+        final ReceiverProcess receiverProcess = createReceiverProcess(identifier);
+        receiverProcess.start();
+
+        long startTime = 17L;
+        long bailAt = getWaitTimeout();
+        for (int i = 0; i < 2000000; i++)
+        {
+            timeTracker.begin(startTime);
+            timeTracker.end(startTime + i);
+
+            startTime += i * 2;
+
+            if (receivedList.size() >= 2 || System.currentTimeMillis() > bailAt)
+            {
+                break;
+            }
+            if (i % 4 == 0)
+            {
+                LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(30L));
+            }
+        }
+
+        timeTrackerFactory.shutdown();
+        // TODO should be waiter
+        LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(100L));
+        assertThat(connectionHandler.getConnectedSocketCount(), is(0));
+
+        receiverProcess.stop(1, TimeUnit.SECONDS);
     }
 
     @Test
@@ -281,14 +320,14 @@ public class RecordingIntegrationTest
 
     private TimeTracker createTimeTracker(final String identifer) throws IOException
     {
-        return new RecordingTimeTrackerFactory().
+        timeTrackerFactory = new RecordingTimeTrackerFactory().
                 publishingTo(new InetSocketAddress("localhost", socketAddress.getPort())).
                 withSenderEvents(new ExceptionTrackingAggregatorEvents(sendExceptions)).
                 withValidation(true).
                 withIdentifer(identifer).
                 publishingEvery(PUBLICATION_INTERVAL, INTERVAL_UNITS).
-                withHistogramConfig(new HistogramConfig(MAX_VALUE, 2)).
-                create();
+                withHistogramConfig(new HistogramConfig(MAX_VALUE, 2));
+        return timeTrackerFactory.create();
     }
 
     private ReceiverProcess createReceiverProcess(final String idFilter) throws IOException
@@ -303,7 +342,7 @@ public class RecordingIntegrationTest
             }
             receiveExceptions.add(e);
         };
-        return new HistogramReceiverFactory().
+        final HistogramReceiverFactory receiverFactory = new HistogramReceiverFactory().
                 listeningTo(serverSocketChannel).
                 withExecutor(newCachedThreadPool(new FluteThreadFactory("test-handler"))).
                 highestTrackableValue(MAX_VALUE).
@@ -314,8 +353,10 @@ public class RecordingIntegrationTest
                     {
                         copyHistogramInto(histogram, receivedList);
                     }
-                }).
-                create();
+                });
+        final ReceiverProcess receiverProcess = receiverFactory.create();
+        this.connectionHandler = receiverFactory.connectionHandler();
+        return receiverProcess;
     }
 
     private long getTotalValueCount(final List<Histogram> histograms)

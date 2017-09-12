@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.aitusoftware.flute.exchanger;
+package com.aitusoftware.flute.lifecycle;
 
-public interface Exchanger
+import com.aitusoftware.flute.record.TimeTracker;
+
+public final class TimeTrackerWeakReferenceProcessor
 {
-    void poll();
+    public void register(final TimeTracker timeTracker)
+    {
+
+    }
 }
