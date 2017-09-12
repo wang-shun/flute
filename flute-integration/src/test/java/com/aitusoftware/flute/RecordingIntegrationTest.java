@@ -27,7 +27,6 @@ import org.HdrHistogram.Histogram;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -123,7 +122,6 @@ public class RecordingIntegrationTest
         assertThat(sendExceptions.isEmpty(), is(true));
     }
 
-    @Ignore("Test for #5")
     @Test
     public void shouldShutdownTimeTrackerConnections() throws Exception
     {

@@ -163,7 +163,10 @@ public class RecordingTimeTrackerFactory
      */
     public void shutdown()
     {
-
+        if (nonBlockingAggregator != null)
+        {
+            nonBlockingAggregator.shutdown();
+        }
     }
 
     /**

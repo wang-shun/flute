@@ -98,7 +98,6 @@ public final class HistogramConnectionHandler
                 clientChannel.configureBlocking(false);
                 clientChannel.register(selector, SelectionKey.OP_READ, new StreamingHistogramReceiver(histogramHandler, highestTrackableValue));
                 connectedSockets.incrementAndGet();
-                System.out.printf("Connected sockets: %s%n", connectedSockets.get());
             }
             catch (final Exception e)
             {

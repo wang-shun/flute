@@ -22,6 +22,7 @@ import com.aitusoftware.flute.exchanger.Exchanger;
 import com.aitusoftware.flute.protocol.Version;
 import com.aitusoftware.flute.protocol.VersionCodec;
 import com.aitusoftware.flute.send.events.AggregatorEvents;
+import com.aitusoftware.flute.util.io.Closer;
 import com.aitusoftware.flute.util.timing.SystemEpochMillisTimeSupplier;
 
 import java.io.IOException;
@@ -41,6 +42,7 @@ public final class NonBlockingAggregator implements Runnable
     private final AggregatorEvents aggregatorEvents;
     private final Consumer<SocketChannelAndExchanger> exchangePollingConsumer = new ExchangePollingConsumer();
     private final Consumer<SocketChannelAndExchanger> pendingDataSenderConsumer = new PendingDataSender();
+    private final Consumer<SocketChannelAndExchanger> closer = new CloserConsumer();
     private final ConnectionAttemptThrottler throttler =
             new ConnectionAttemptThrottler(new SystemEpochMillisTimeSupplier(), 250L, 5000L, TimeUnit.SECONDS);
 
@@ -65,6 +67,25 @@ public final class NonBlockingAggregator implements Runnable
             exchangers.forEach(pendingDataSenderConsumer);
 
             LockSupport.parkNanos(pollUnit.toNanos(pollInterval));
+        }
+    }
+
+    public void register(final Exchanger exchanger, final AggregatingDataSender sender, final String identifier)
+    {
+        exchangers.add(new SocketChannelAndExchanger(exchanger, sender, identifier));
+    }
+
+    public void shutdown()
+    {
+        exchangers.forEach(closer);
+    }
+
+    private static final class CloserConsumer implements Consumer<SocketChannelAndExchanger>
+    {
+        @Override
+        public void accept(final SocketChannelAndExchanger unit)
+        {
+            Closer.closeQuietly(unit.socketChannel);
         }
     }
 
@@ -142,11 +163,6 @@ public final class NonBlockingAggregator implements Runnable
             unit.reset(socketChannel);
             throttler.connectionSuccessful();
         }
-    }
-
-    public void register(final Exchanger exchanger, final AggregatingDataSender sender, final String identifier)
-    {
-        exchangers.add(new SocketChannelAndExchanger(exchanger, sender, identifier));
     }
 
     private static final class SocketChannelAndExchanger
