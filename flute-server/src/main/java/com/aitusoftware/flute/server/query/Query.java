@@ -16,7 +16,6 @@
 package com.aitusoftware.flute.server.query;
 
 import java.time.Instant;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public final class Query
