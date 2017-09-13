@@ -16,6 +16,7 @@
 package com.aitusoftware.flute.agent.intercept;
 
 import com.aitusoftware.flute.agent.annotation.FluteMetric;
+import com.aitusoftware.flute.agent.annotation.MetricNameSubstitution;
 import com.aitusoftware.flute.config.HistogramConfig;
 import com.aitusoftware.flute.config.PublicationIntervalConfig;
 import com.aitusoftware.flute.factory.RecordingTimeTrackerFactory;
@@ -214,7 +215,16 @@ public final class Agent
 
     private static TimeTracker createTimeTracker(final RecordingTimeTrackerFactory timeTrackerFactory, final MethodDescription.InDefinedShape declaredMethod)
     {
-        return timeTrackerFactory.withIdentifer(declaredMethod.getName()).create();
+        String metricName = declaredMethod.getName();
+        try
+        {
+            final FluteMetric fluteMetric = declaredMethod.getDeclaredAnnotations().ofType(FluteMetric.class).load();
+            metricName = MetricNameSubstitution.INSTANCE.getMetricName(declaredMethod.getName(), fluteMetric);
+        }
+        catch (ClassNotFoundException e)
+        {
+            System.err.printf("Unable to load annotation class: %s", e.getMessage());
+        }
+        return timeTrackerFactory.withIdentifer(metricName).create();
     }
-
 }

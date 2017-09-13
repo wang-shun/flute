@@ -36,12 +36,13 @@ public final class InstrumentationTest
             timedClient.createSample();
         }
 
-        waitFor(() -> metricServer.getLatestCountForMetric("createSample") != 0);
+        final String metricName = "user.key.for." + System.getProperty("user.name");
+        waitFor(() -> metricServer.getLatestCountForMetric(metricName) != 0);
     }
 
     private static final class TimedClient
     {
-        @FluteMetric
+        @FluteMetric(metricName = "user.key.for.${user.name}")
         public void createSample()
         {
             LockSupport.parkNanos(15L);

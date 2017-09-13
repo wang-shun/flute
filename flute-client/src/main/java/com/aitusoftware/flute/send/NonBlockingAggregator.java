@@ -45,6 +45,7 @@ public final class NonBlockingAggregator implements Runnable
     private final Consumer<SocketChannelAndExchanger> closer = new CloserConsumer();
     private final ConnectionAttemptThrottler throttler =
             new ConnectionAttemptThrottler(new SystemEpochMillisTimeSupplier(), 250L, 5000L, TimeUnit.SECONDS);
+    private volatile boolean shutdown = false;
 
     public NonBlockingAggregator(
             final Supplier<SocketChannel> socketChannelSupplier,
@@ -61,7 +62,7 @@ public final class NonBlockingAggregator implements Runnable
     @Override
     public void run()
     {
-        while (!Thread.currentThread().isInterrupted())
+        while (!Thread.currentThread().isInterrupted() && !shutdown)
         {
             exchangers.forEach(exchangePollingConsumer);
             exchangers.forEach(pendingDataSenderConsumer);
@@ -77,6 +78,7 @@ public final class NonBlockingAggregator implements Runnable
 
     public void shutdown()
     {
+        shutdown = true;
         exchangers.forEach(closer);
     }
 
@@ -160,6 +162,7 @@ public final class NonBlockingAggregator implements Runnable
         if(throttler.shouldAttemptConnection())
         {
             final SocketChannel socketChannel = socketChannelConnector.registerSenderWithSocket();
+            Closer.closeQuietly(unit.socketChannel);
             unit.reset(socketChannel);
             throttler.connectionSuccessful();
         }

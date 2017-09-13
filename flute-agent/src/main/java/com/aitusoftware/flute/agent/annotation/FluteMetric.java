@@ -21,5 +21,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FluteMetric
 {
-
+    String USE_METHOD_NAME = "USE_METHOD_NAME";
+    String metricName() default USE_METHOD_NAME;
 }

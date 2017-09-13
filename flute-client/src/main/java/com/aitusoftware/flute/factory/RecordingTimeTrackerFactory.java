@@ -184,7 +184,6 @@ public class RecordingTimeTrackerFactory
             }
         }
 
-        // TODO identify stoppable components & retain reference
         final Sender sender = new AggregatingDataSender(4194304, 524288);
         final HistogramPublisher histogramPublisher = new HistogramPublisher(sender, identifier, aggregatorEvents);
         final Supplier<Histogram> histogramSupplier;

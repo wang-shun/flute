@@ -84,6 +84,7 @@ public class RecordingIntegrationTest
     @After
     public void after() throws Exception
     {
+        timeTrackerFactory.shutdown();
         scheduler.shutdownNow();
         assertTrue(scheduler.awaitTermination(1L, TimeUnit.SECONDS));
         serverSocketChannel.close();
@@ -150,7 +151,7 @@ public class RecordingIntegrationTest
 
         timeTrackerFactory.shutdown();
         // TODO should be waiter
-        LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(100L));
+        LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(500L));
         assertThat(connectionHandler.getConnectedSocketCount(), is(0));
 
         receiverProcess.stop(1, TimeUnit.SECONDS);

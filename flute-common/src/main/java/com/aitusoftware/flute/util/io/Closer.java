@@ -20,7 +20,7 @@ import java.io.IOException;
 
 public enum Closer
 {
-    ;
+    INSTANCE;
 
     public static void closeQuietly(final Closeable closeable)
     {
