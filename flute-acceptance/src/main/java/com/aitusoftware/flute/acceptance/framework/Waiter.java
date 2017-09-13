@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Aitu Software Limited.
+ * Copyright 2016 - 2017 Aitu Software Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 
 public final class Waiter
 {
-    private static final long TIMEOUT_MILLIS = 20000L;
+    private static final long TIMEOUT_MILLIS = 40000L;
 
     public static void waitFor(final Supplier<Boolean> condition)
     {

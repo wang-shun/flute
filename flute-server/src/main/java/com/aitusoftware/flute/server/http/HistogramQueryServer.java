@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Aitu Software Limited.
+ * Copyright 2016 - 2017 Aitu Software Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,9 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.util.resource.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -41,11 +44,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
+import java.net.URL;
 
 import static java.net.InetSocketAddress.createUnresolved;
 
 public final class HistogramQueryServer
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HistogramQueryServer.class);
+    private static final String WELL_KNOWN_RESOURCE_PATH = "ui/html/index.html";
+
     private final ServerConfig serverConfig;
     private final DatabaseConfig databaseConfig;
     private final HistogramConfig histogramConfig;
@@ -77,14 +84,28 @@ public final class HistogramQueryServer
             final MetricIdentifierDao metricIdentifierDao = new MetricIdentifierDao(connectionFactory);
             final ResourceHandler resourceHandler = new ResourceHandler();
             resourceHandler.setDirectoriesListed(false);
-            // TODO needs to be parameterised
-            if(System.getProperty("flute.resource.base") != null)
+            final String fileSystemResourceBase = System.getProperty("flute.resource.base");
+            if(fileSystemResourceBase != null)
             {
-                resourceHandler.setResourceBase(System.getProperty("flute.resource.base"));
+                LOGGER.info("Setting resource base to file-system location {}", fileSystemResourceBase);
+                resourceHandler.setResourceBase(fileSystemResourceBase);
             }
             else
             {
-                resourceHandler.setResourceBase("/work/deploy/resources");
+                final URL wellKnownResource = Thread.currentThread().getContextClassLoader().
+                        getResource(WELL_KNOWN_RESOURCE_PATH);
+                if (wellKnownResource == null)
+                {
+                    LOGGER.warn("Unable to load UI resources from classpath");
+                }
+                else
+                {
+                    final String serverJarFile = wellKnownResource.getFile().split("!")[0];
+                    final String jarUrl = String.format("jar:%s!/", serverJarFile);
+                    LOGGER.info("Setting resource base to jar file {}", jarUrl);
+                    final Resource jarFileResource = Resource.newResource(new URL(jarUrl));
+                    resourceHandler.setBaseResource(jarFileResource);
+                }
             }
             final ReportDao reportDao = new ReportDao(new ConnectionFactory(reportDatabaseConfig));
             addContextHandler(handlers, "/flute/report/create", ModifyReportHandler.createMode(reportDao));

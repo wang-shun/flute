@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Aitu Software Limited.
+ * Copyright 2016 - 2017 Aitu Software Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,11 @@ import com.aitusoftware.flute.compatibility.Utf8Charset;
 import com.aitusoftware.flute.exchanger.TimeWindow;
 import com.aitusoftware.flute.send.events.AggregatorEvents;
 import org.HdrHistogram.Histogram;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 
 public final class HistogramPublisher implements BiConsumer<Histogram, TimeWindow>
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HistogramPublisher.class);
     private static final int ID_BYTES_LENGTH_INDICATOR_LENGTH = 4;
     private static final int TIMESTAMP_LENGTH = 8;
 
@@ -56,10 +53,6 @@ public final class HistogramPublisher implements BiConsumer<Histogram, TimeWindo
 
     public void publish(final Histogram histogram, final TimeWindow timeWindow)
     {
-        if (LOGGER.isDebugEnabled())
-        {
-            LOGGER.debug("Publish histogram of size {} for window {}", histogram.getTotalCount(), timeWindow);
-        }
         try
         {
             final int estimatedFootprint = histogram.getEstimatedFootprintInBytes();

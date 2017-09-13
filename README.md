@@ -1,6 +1,6 @@
 # Flute
 
-## Measuring latency > sampling latency
+## Measuring latency beats sampling latency
 
 ### Overview
 
@@ -59,8 +59,6 @@ java -cp ./flute-persistor-all-0.1.2 com.aitusoftware.flute.archive.FluteMetrics
 * Server configuration
    * listen address
       * `flute.server.httpPort=15002`
-   * UI resources
-      * `flute.resource.base=server/src/main/resources/ui`
    * database connection
       * `flute.db.metrics.username=SA`
       * `flute.db.metrics.password=password`

@@ -96,12 +96,9 @@ flute.server.httpPort=15002
 ```
 
    1. Download [flute-server-all-0.1.2.jar](https://github.com/aitusoftware/flute/releases/download/v0.1.2/flute-server-all-0.1.2.jar).
-   2. Clone the __Flute__ repository, or download source and unzip the source so that the server UI resources are available to the application. [See #2](https://github.com/aitusoftware/flute/issues/2).
-   3. Make a note of the resource directory; relative the repository root, it will be `server/src/main/resources/ui`.
-   4. E.g. `RESOURCE_DIR=server/src/main/resources/ui`
    4. Execute command:
 ```
-java -cp flute-server-all-0.1.2.jar -Dflute.resource.base=$RESOURCE_DIR \
+java -cp flute-server-all-0.1.2.jar \
 com.aitusoftware.flute.server.http.HttpQueryServerMain $CONFIG_FILE
 ```
 
