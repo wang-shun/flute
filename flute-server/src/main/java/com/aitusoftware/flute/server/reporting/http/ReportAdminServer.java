@@ -13,16 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.aitusoftware.flute.server.http;
+package com.aitusoftware.flute.server.reporting.http;
 
 import com.aitusoftware.flute.config.ConnectionFactory;
 import com.aitusoftware.flute.config.DatabaseConfig;
-import com.aitusoftware.flute.config.HistogramConfig;
 import com.aitusoftware.flute.server.config.ServerConfig;
-import com.aitusoftware.flute.server.dao.jdbc.HistogramRetrievalDao;
 import com.aitusoftware.flute.server.dao.jdbc.MetricIdentifierDao;
 import com.aitusoftware.flute.server.reporting.dao.ReportDao;
-import com.aitusoftware.flute.server.reporting.http.ViewReportConfigHandler;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -44,25 +41,22 @@ import java.net.URL;
 
 import static java.net.InetSocketAddress.createUnresolved;
 
-final class HistogramQueryServer
+final class ReportAdminServer
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HistogramQueryServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReportAdminServer.class);
     private static final String WELL_KNOWN_RESOURCE_PATH = "ui/html/index.html";
 
     private final ServerConfig serverConfig;
     private final DatabaseConfig databaseConfig;
-    private final HistogramConfig histogramConfig;
     private final DatabaseConfig reportDatabaseConfig;
 
-    HistogramQueryServer(
+    ReportAdminServer(
             final ServerConfig serverConfig,
             final DatabaseConfig metricsDatabaseConfig,
-            final HistogramConfig histogramConfig,
             final DatabaseConfig reportDatabaseConfig)
     {
         this.serverConfig = serverConfig;
         this.databaseConfig = metricsDatabaseConfig;
-        this.histogramConfig = histogramConfig;
         this.reportDatabaseConfig = reportDatabaseConfig;
     }
 
@@ -75,8 +69,6 @@ final class HistogramQueryServer
         try
         {
             final ConnectionFactory connectionFactory = new ConnectionFactory(databaseConfig);
-            final HistogramRetrievalDao histogramRetrievalDao =
-                    new HistogramRetrievalDao(connectionFactory, histogramConfig, 1024 * 1024);
             final MetricIdentifierDao metricIdentifierDao = new MetricIdentifierDao(connectionFactory);
             final ResourceHandler resourceHandler = new ResourceHandler();
             resourceHandler.setDirectoriesListed(false);
@@ -104,14 +96,12 @@ final class HistogramQueryServer
                 }
             }
             final ReportDao reportDao = new ReportDao(new ConnectionFactory(reportDatabaseConfig));
+            addContextHandler(handlers, "/flute/report/create", ModifyReportHandler.createMode(reportDao));
+            addContextHandler(handlers, "/flute/report/amend", ModifyReportHandler.amendMode(reportDao));
+            addContextHandler(handlers, "/flute/report/delete", new DeleteReportHandler(reportDao));
+            addContextHandler(handlers, "/flute/report/get", new GetReportHandler(reportDao));
+            addContextHandler(handlers, "/flute/report/list", new ListReportsHandler(reportDao));
             addContextHandler(handlers, "/flute/report/spec", new ViewReportConfigHandler(reportDao, metricIdentifierDao));
-
-            addContextHandler(handlers, "/flute/query/slaReport", new SlaReportHandler(histogramRetrievalDao, metricIdentifierDao, false, histogramConfig.asSupplier()));
-            addContextHandler(handlers, "/flute/query/slaPercentiles", new SlaPercentileChartHandler(histogramRetrievalDao, metricIdentifierDao, false, histogramConfig.asSupplier()));
-            addContextHandler(handlers, "/flute/query/standardPercentilesCsv", new CsvStandardPercentilesHandler(histogramRetrievalDao, metricIdentifierDao, false, histogramConfig.asSupplier()));
-            addContextHandler(handlers, "/flute/query/timeSeries", new TimeSeriesChartHandler(histogramRetrievalDao, metricIdentifierDao, false));
-            addContextHandler(handlers, "/flute/query/aggregator", new SlaReportHandler(histogramRetrievalDao, metricIdentifierDao, true, histogramConfig.asSupplier()));
-            addContextHandler(handlers, "/flute/query/metricSearch", new MetricIdentifierSearchHandler(metricIdentifierDao));
 
             addContextHandler(handlers, "/flute/resources", resourceHandler);
         }

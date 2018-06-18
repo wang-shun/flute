@@ -27,11 +27,11 @@ import java.io.PrintWriter;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public final class MetricIdentifierSearchHandler extends DefaultHandler
+final class MetricIdentifierSearchHandler extends DefaultHandler
 {
     private final MetricIdentifierDao metricIdentifierDao;
 
-    public MetricIdentifierSearchHandler(final MetricIdentifierDao metricIdentifierDao)
+    MetricIdentifierSearchHandler(final MetricIdentifierDao metricIdentifierDao)
     {
         this.metricIdentifierDao = metricIdentifierDao;
     }

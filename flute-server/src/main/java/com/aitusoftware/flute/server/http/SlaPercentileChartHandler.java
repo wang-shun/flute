@@ -20,6 +20,7 @@ import com.aitusoftware.flute.server.dao.jdbc.HistogramRetrievalDao;
 import com.aitusoftware.flute.server.dao.jdbc.MetricIdentifierDao;
 import com.aitusoftware.flute.server.query.FullHistogramHandler;
 import com.aitusoftware.flute.server.query.Query;
+import com.aitusoftware.flute.server.shared.ReportingConfigSerialiser;
 import org.HdrHistogram.Histogram;
 import org.HdrHistogram.HistogramIterationValue;
 import org.HdrHistogram.PercentileIterator;
@@ -38,14 +39,14 @@ import java.util.function.Supplier;
 import static java.lang.String.format;
 import static java.util.Collections.singleton;
 
-public final class SlaPercentileChartHandler extends DefaultHandler
+final class SlaPercentileChartHandler extends DefaultHandler
 {
     private final HistogramRetrievalDao histogramRetrievalDao;
     private final MetricIdentifierDao metricIdentifierDao;
     private final boolean isAggregator;
     private final HistogramCache histogramCache;
 
-    public SlaPercentileChartHandler(final HistogramRetrievalDao histogramRetrievalDao,
+    SlaPercentileChartHandler(final HistogramRetrievalDao histogramRetrievalDao,
                                      final MetricIdentifierDao metricIdentifierDao,
                                      final boolean isAggregator, final Supplier<Histogram> histogramSupplier)
     {

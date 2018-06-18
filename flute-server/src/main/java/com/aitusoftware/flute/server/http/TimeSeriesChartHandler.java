@@ -18,6 +18,7 @@ package com.aitusoftware.flute.server.http;
 import com.aitusoftware.flute.server.dao.jdbc.HistogramRetrievalDao;
 import com.aitusoftware.flute.server.dao.jdbc.MetricIdentifierDao;
 import com.aitusoftware.flute.server.query.Query;
+import com.aitusoftware.flute.server.shared.ReportingConfigSerialiser;
 import org.HdrHistogram.Histogram;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -35,7 +36,7 @@ import java.util.Set;
 
 import static java.util.Collections.singleton;
 
-public final class TimeSeriesChartHandler extends DefaultHandler
+final class TimeSeriesChartHandler extends DefaultHandler
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeSeriesChartHandler.class);
 

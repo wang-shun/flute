@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public final class ModifyReportHandler extends AbstractHandler
+final class ModifyReportHandler extends AbstractHandler
 {
     private enum Mode
     {
@@ -74,12 +74,12 @@ public final class ModifyReportHandler extends AbstractHandler
         baseRequest.setHandled(true);
     }
 
-    public static ModifyReportHandler createMode(final ReportDao reportDao)
+    static ModifyReportHandler createMode(final ReportDao reportDao)
     {
         return new ModifyReportHandler(reportDao, Mode.CREATE);
     }
 
-    public static ModifyReportHandler amendMode(final ReportDao reportDao)
+    static ModifyReportHandler amendMode(final ReportDao reportDao)
     {
         return new ModifyReportHandler(reportDao, Mode.AMEND);
     }

@@ -16,11 +16,11 @@
 package com.aitusoftware.flute.server.reporting.http;
 
 import com.aitusoftware.flute.server.dao.jdbc.MetricIdentifierDao;
-import com.aitusoftware.flute.server.http.ReportingConfigSerialiser;
 import com.aitusoftware.flute.server.reporting.dao.ReportDao;
 import com.aitusoftware.flute.server.reporting.domain.ReportSpecification;
 import com.aitusoftware.flute.server.reporting.domain.Threshold;
 import com.aitusoftware.flute.server.reporting.domain.TimeWindow;
+import com.aitusoftware.flute.server.shared.ReportingConfigSerialiser;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 

@@ -34,7 +34,7 @@ import java.util.function.Supplier;
 
 import static java.util.Collections.singleton;
 
-public final class CsvStandardPercentilesHandler extends DefaultHandler
+final class CsvStandardPercentilesHandler extends DefaultHandler
 {
     private final HistogramRetrievalDao histogramRetrievalDao;
     private final MetricIdentifierDao metricIdentifierDao;

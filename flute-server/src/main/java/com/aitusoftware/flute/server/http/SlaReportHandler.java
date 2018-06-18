@@ -34,14 +34,14 @@ import java.util.function.Supplier;
 
 import static java.util.Collections.singleton;
 
-public final class SlaReportHandler extends DefaultHandler
+final class SlaReportHandler extends DefaultHandler
 {
     private final HistogramRetrievalDao histogramRetrievalDao;
     private final MetricIdentifierDao metricIdentifierDao;
     private final boolean isAggregator;
     private final HistogramCache histogramCache;
 
-    public SlaReportHandler(final HistogramRetrievalDao histogramRetrievalDao,
+    SlaReportHandler(final HistogramRetrievalDao histogramRetrievalDao,
                             final MetricIdentifierDao metricIdentifierDao,
                             final boolean isAggregator, final Supplier<Histogram> histogramSupplier)
     {

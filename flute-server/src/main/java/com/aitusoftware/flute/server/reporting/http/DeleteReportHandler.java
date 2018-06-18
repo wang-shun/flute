@@ -24,11 +24,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public final class DeleteReportHandler extends AbstractHandler
+final class DeleteReportHandler extends AbstractHandler
 {
     private final ReportDao reportDao;
 
-    public DeleteReportHandler(final ReportDao reportDao)
+    DeleteReportHandler(final ReportDao reportDao)
     {
         this.reportDao = reportDao;
     }

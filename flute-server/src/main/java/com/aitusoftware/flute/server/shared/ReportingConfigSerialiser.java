@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.aitusoftware.flute.server.http;
+package com.aitusoftware.flute.server.shared;
 
 import com.aitusoftware.flute.server.dao.jdbc.MetricIdentifierDao;
 import com.aitusoftware.flute.server.reporting.domain.Threshold;

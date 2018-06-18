@@ -26,11 +26,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public final class GetReportHandler extends AbstractHandler
+final class GetReportHandler extends AbstractHandler
 {
     private final ReportDao reportDao;
 
-    public GetReportHandler(final ReportDao reportDao)
+    GetReportHandler(final ReportDao reportDao)
     {
         this.reportDao = reportDao;
     }
