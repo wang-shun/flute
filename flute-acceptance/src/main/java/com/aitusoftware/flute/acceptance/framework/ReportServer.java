@@ -25,7 +25,7 @@ import java.util.Map;
 public final class ReportServer
 {
     private static final String SERVER_HOST = "localhost";
-    private static final int SERVER_PORT = 15002;
+    private static final int SERVER_PORT = 15003;
     private static final String SERVER_ADDRESS = "http://" + SERVER_HOST + ":" + SERVER_PORT;
     private static final String CREATE_REPORT_URI = "/flute/report/create";
     private static final String AMEND_REPORT_URI = "/flute/report/amend";

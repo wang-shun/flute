@@ -411,7 +411,7 @@ task wrapper(type: Wrapper) {
 }
 
 class Version {
-    int major = 0, minor = 0, revision = 0
+    int major = 0, minor = 1, revision = 0
 
     String toString() {
         "$major.$minor.$revision"
