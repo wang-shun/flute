@@ -61,6 +61,4 @@ public final class DatabaseConfig
                 RequiredProperties.requiredProperty("flute.db." + prefix + ".password", properties),
                 RequiredProperties.requiredProperty("flute.db." + prefix + ".driver.className", properties));
     }
-
-
 }

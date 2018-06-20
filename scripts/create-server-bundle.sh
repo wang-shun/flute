@@ -28,6 +28,10 @@ cp scripts/start-metric-server.sh $SCRIPT_DIR
 cp scripts/start-persistor.sh $SCRIPT_DIR
 cp scripts/start-report-admin-server.sh $SCRIPT_DIR
 
+cp config/metrics-server-template.properties $SCRIPT_DIR
+cp config/report-server-template.properties $SCRIPT_DIR
+cp config/persistor-template.properties $SCRIPT_DIR
+
 sed -i -e "s/FLUTE_VERSION/$VERSION/g" $SCRIPT_DIR/*.sh
 
 cd $TMP_DIR

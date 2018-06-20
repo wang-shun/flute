@@ -47,7 +47,7 @@ final class ReportAdminServer
     private static final String WELL_KNOWN_RESOURCE_PATH = "ui/html/index.html";
 
     private final ServerConfig serverConfig;
-    private final DatabaseConfig databaseConfig;
+    private final DatabaseConfig metricDatabaseConfig;
     private final DatabaseConfig reportDatabaseConfig;
 
     ReportAdminServer(
@@ -56,7 +56,7 @@ final class ReportAdminServer
             final DatabaseConfig reportDatabaseConfig)
     {
         this.serverConfig = serverConfig;
-        this.databaseConfig = metricsDatabaseConfig;
+        this.metricDatabaseConfig = metricsDatabaseConfig;
         this.reportDatabaseConfig = reportDatabaseConfig;
     }
 
@@ -68,7 +68,7 @@ final class ReportAdminServer
 
         try
         {
-            final ConnectionFactory connectionFactory = new ConnectionFactory(databaseConfig);
+            final ConnectionFactory connectionFactory = new ConnectionFactory(metricDatabaseConfig);
             final MetricIdentifierDao metricIdentifierDao = new MetricIdentifierDao(connectionFactory);
             final ResourceHandler resourceHandler = new ResourceHandler();
             resourceHandler.setDirectoriesListed(false);
