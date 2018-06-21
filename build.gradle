@@ -175,6 +175,8 @@ subprojects {
     }
 
     task bundleJar(type: Jar) {
+        version = new Version(major: 0, minor: 1, revision: 4)
+
         manifest.attributes('Built-By': System.properties['user.name'],
                 'Bundle-Name': fullName,
                 'Bundle-Vendor': teamName,
@@ -234,6 +236,7 @@ project(':flute-agent') {
     }
 
     bundleJar {
+        version = new Version(major: 0, minor: 1, revision: 4)
         manifest.attributes('Built-By': System.properties['user.name'],
                 'Bundle-Name': fullName,
                 'Bundle-Vendor': teamName,
