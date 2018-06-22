@@ -27,6 +27,8 @@ import static com.aitusoftware.flute.config.SocketAddressParser.fromAddressSpec;
 
 public final class TimingClientMain
 {
+    private static final long RUNTIME_MINUTES = Long.getLong("flute.test.client.runtime", 4);
+
     public static void main(final String[] args) throws Exception
     {
         if(args.length < 1)
@@ -46,6 +48,6 @@ public final class TimingClientMain
                         histogramConfig, recordingAddress);
         timingClient.init();
 
-        timingClient.generateTestData(4, TimeUnit.MINUTES);
+        timingClient.generateTestData(RUNTIME_MINUTES, TimeUnit.MINUTES);
     }
 }
