@@ -55,7 +55,7 @@
                 appendThreshold(reportSpecification.thresholds, ALL_THRESHOLDS[i]);
             }
 
-            fluteUtil.post('../../report/create/', reportSpecification,
+            fluteUtil.post('/flute/app/report/create/', reportSpecification,
                 function(response) {
                     loadAndDisplayAvailableReports();
                 },
@@ -73,7 +73,7 @@
                 d3.select('#deleteConfirmationLabel').classed('alertControl', true);
             } else {
                 var reportName = d3.select('#reportName').property('value');
-                fluteUtil.post('../../report/delete/' + reportName, {},
+                fluteUtil.post('/flute/app/report/delete/' + reportName, {},
                     function(response) {
                         loadAndDisplayAvailableReports();
                     },
@@ -93,7 +93,7 @@
 
         d3.select('.metricSearch').on('keyup', function() {
             var searchTerm = '.*' + d3.select('.metricSearch').property('value') + '.*';
-            fluteUtil.get('../../query/metricSearch/' + searchTerm,
+            fluteUtil.get('/flute/app/query/metricSearch/' + searchTerm,
                 function(response) {
                     var matchingElements = '';
                     for(var i = 0; i < response.length; i++) {
@@ -129,7 +129,7 @@
     }
 
     function populateFormData(reportName) {
-        fluteUtil.get('../../report/get/' + reportName, function(reportSpecification) {
+        fluteUtil.get('/flute/app/report/get/' + reportName, function(reportSpecification) {
             d3.select('#reportName').property('value', reportSpecification.reportName);
             d3.select('#reportName').property('readOnly', true);
             d3.select('#metricPattern').property('value', reportSpecification.selectorPattern);
@@ -157,7 +157,7 @@
     }
 
     function loadAndDisplayAvailableReports() {
-        fluteUtil.get('../../report/list', function(reportList) {
+        fluteUtil.get('/flute/app/report/list', function(reportList) {
             if(reportList.length === 0) {
                 hideBlock(d3.select('.listReportsPanel'));
                 resetAndDisplayCreateReportForm();

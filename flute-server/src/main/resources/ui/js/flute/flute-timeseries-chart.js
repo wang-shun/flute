@@ -121,7 +121,7 @@
     };
 
     function getDataUrl(metric, reportWindow, endTimestamp) {
-        var url = '../../query/timeSeries/' + metric.metricName +
+        var url = '/flute/app/query/timeSeries/' + metric.metricName +
             '/' + reportWindow.duration + '/' + reportWindow.unit;
         if(endTimestamp !== undefined && endTimestamp !== null) {
             url += '/' + endTimestamp;

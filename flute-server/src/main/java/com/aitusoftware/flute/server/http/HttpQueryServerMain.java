@@ -15,9 +15,7 @@
  */
 package com.aitusoftware.flute.server.http;
 
-import com.aitusoftware.flute.archive.ManagedDatabase;
 import com.aitusoftware.flute.config.DatabaseConfig;
-import com.aitusoftware.flute.config.FlywayProperties;
 import com.aitusoftware.flute.config.HistogramConfig;
 import com.aitusoftware.flute.server.config.ServerConfig;
 
@@ -40,9 +38,6 @@ public final class HttpQueryServerMain
         final ServerConfig serverConfig = ServerConfig.fromFluteProperties(properties);
         final HistogramConfig histogramConfig = HistogramConfig.fromFluteProperties(properties);
         final DatabaseConfig reportDatabaseConfig = DatabaseConfig.fromFluteProperties(properties, "reports");
-
-        new ManagedDatabase().init(new FlywayProperties(reportDatabaseConfig).getProperties());
-
 
         final HistogramQueryServer queryServer =
                 new HistogramQueryServer(serverConfig, metricsDatabaseConfig,

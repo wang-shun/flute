@@ -54,7 +54,7 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
         var reportWindowDurationMatch = /.*(\?|&)reportWindowDuration\=([^&]+)/.exec(window.location.search);
         if(reportNameMatch !== null) {
             reportName = reportNameMatch[2];
-            fluteUtil.get('../../report/spec/' + reportName,
+            fluteUtil.get('/flute/app/report/spec/' + reportName,
                 function(reportConfig) {
                     d3.selectAll('.status').text('Retrieved reporting config.');
                     d3.select('#headerReportName').text(reportName);
@@ -97,7 +97,7 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
     }
 
     function reloadReportConfig() {
-        fluteUtil.get('../../report/spec/' + reportName,
+        fluteUtil.get('/flute/app/report/spec/' + reportName,
             function(reportConfig) {
                 if(reportConfig[0].metricThresholds.length !== currentReportConfig[0].metricThresholds.length) {
                     window.location.reload();
@@ -167,7 +167,7 @@ METRIC_NAME_TO_DISPLAY_NAME["COUNT"] = 'Count';
 
                     for(var r = 0; r < this.reportWindows.length; r++) {
                         var reportWindow = this.reportWindows[r];
-                        var url = '../../query/slaReport/' +
+                        var url = '/flute/app/query/slaReport/' +
                                     metric.metricName + '/' +
                                     reportWindow.duration + '/' +
                                     reportWindow.unit;

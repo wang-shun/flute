@@ -9,7 +9,7 @@ if [[ "$CONFIG_FILE" == "" ]]; then
     echo "Specify config file as first argument to this script"
 fi
 
-java -XX:+UnlockCommercialFeatures -XX:+FlightRecorder \
+java  \
 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5007 \
 -cp $LIB_DIR/flute-server-all-FLUTE_VERSION.jar  -Djava.net.preferIPv4Stack=true \
 -Dlog4j.configuration=file://$SCRIPT_DIR/log4j.xml \

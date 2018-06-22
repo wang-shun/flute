@@ -27,11 +27,11 @@ public final class ReportServer
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 15003;
     private static final String SERVER_ADDRESS = "http://" + SERVER_HOST + ":" + SERVER_PORT;
-    private static final String CREATE_REPORT_URI = "/flute/report/create";
-    private static final String AMEND_REPORT_URI = "/flute/report/amend";
-    private static final String DELETE_REPORT_URI = "/flute/report/delete/%s";
-    private static final String GET_REPORT_URI = "/flute/report/get/%s";
-    private static final String LIST_REPORTS_URI = "/flute/report/list";
+    private static final String CREATE_REPORT_URI = "/flute/app/report/create";
+    private static final String AMEND_REPORT_URI = "/flute/app/report/amend";
+    private static final String DELETE_REPORT_URI = "/flute/app/report/delete/%s";
+    private static final String GET_REPORT_URI = "/flute/app/report/get/%s";
+    private static final String LIST_REPORTS_URI = "/flute/app/report/list";
 
     public ReportServer()
     {

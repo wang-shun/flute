@@ -47,7 +47,7 @@ import static java.net.InetSocketAddress.createUnresolved;
 final class HistogramQueryServer
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(HistogramQueryServer.class);
-    private static final String WELL_KNOWN_RESOURCE_PATH = "ui/html/index.html";
+    private static final String WELL_KNOWN_RESOURCE_PATH = "ui/index.html";
 
     private final ServerConfig serverConfig;
     private final DatabaseConfig databaseConfig;
@@ -104,14 +104,14 @@ final class HistogramQueryServer
                 }
             }
             final ReportDao reportDao = new ReportDao(new ConnectionFactory(reportDatabaseConfig));
-            addContextHandler(handlers, "/flute/report/spec", new ViewReportConfigHandler(reportDao, metricIdentifierDao));
+            addContextHandler(handlers, "/flute/app/report/spec", new ViewReportConfigHandler(reportDao, metricIdentifierDao));
 
-            addContextHandler(handlers, "/flute/query/slaReport", new SlaReportHandler(histogramRetrievalDao, metricIdentifierDao, false, histogramConfig.asSupplier()));
-            addContextHandler(handlers, "/flute/query/slaPercentiles", new SlaPercentileChartHandler(histogramRetrievalDao, metricIdentifierDao, false, histogramConfig.asSupplier()));
-            addContextHandler(handlers, "/flute/query/standardPercentilesCsv", new CsvStandardPercentilesHandler(histogramRetrievalDao, metricIdentifierDao, false, histogramConfig.asSupplier()));
-            addContextHandler(handlers, "/flute/query/timeSeries", new TimeSeriesChartHandler(histogramRetrievalDao, metricIdentifierDao, false));
-            addContextHandler(handlers, "/flute/query/aggregator", new SlaReportHandler(histogramRetrievalDao, metricIdentifierDao, true, histogramConfig.asSupplier()));
-            addContextHandler(handlers, "/flute/query/metricSearch", new MetricIdentifierSearchHandler(metricIdentifierDao));
+            addContextHandler(handlers, "/flute/app/query/slaReport", new SlaReportHandler(histogramRetrievalDao, metricIdentifierDao, false, histogramConfig.asSupplier()));
+            addContextHandler(handlers, "/flute/app/query/slaPercentiles", new SlaPercentileChartHandler(histogramRetrievalDao, metricIdentifierDao, false, histogramConfig.asSupplier()));
+            addContextHandler(handlers, "/flute/app/query/standardPercentilesCsv", new CsvStandardPercentilesHandler(histogramRetrievalDao, metricIdentifierDao, false, histogramConfig.asSupplier()));
+            addContextHandler(handlers, "/flute/app/query/timeSeries", new TimeSeriesChartHandler(histogramRetrievalDao, metricIdentifierDao, false));
+            addContextHandler(handlers, "/flute/app/query/aggregator", new SlaReportHandler(histogramRetrievalDao, metricIdentifierDao, true, histogramConfig.asSupplier()));
+            addContextHandler(handlers, "/flute/app/query/metricSearch", new MetricIdentifierSearchHandler(metricIdentifierDao));
 
             addContextHandler(handlers, "/flute/resources", resourceHandler);
         }

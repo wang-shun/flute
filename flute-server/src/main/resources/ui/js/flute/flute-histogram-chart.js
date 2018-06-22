@@ -177,7 +177,7 @@
     };
 
     function getDataUrl(metric, reportWindow, endTimestamp) {
-        return '../../query/slaPercentiles/' +
+        return '/flute/app/query/slaPercentiles/' +
              metric.metricName + '/' +
              reportWindow.duration + '/' +
              reportWindow.unit;

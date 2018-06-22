@@ -44,7 +44,7 @@ import static java.net.InetSocketAddress.createUnresolved;
 final class ReportAdminServer
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportAdminServer.class);
-    private static final String WELL_KNOWN_RESOURCE_PATH = "ui/html/index.html";
+    private static final String WELL_KNOWN_RESOURCE_PATH = "ui/index.html";
 
     private final ServerConfig serverConfig;
     private final DatabaseConfig metricDatabaseConfig;
@@ -96,12 +96,12 @@ final class ReportAdminServer
                 }
             }
             final ReportDao reportDao = new ReportDao(new ConnectionFactory(reportDatabaseConfig));
-            addContextHandler(handlers, "/flute/report/create", ModifyReportHandler.createMode(reportDao));
-            addContextHandler(handlers, "/flute/report/amend", ModifyReportHandler.amendMode(reportDao));
-            addContextHandler(handlers, "/flute/report/delete", new DeleteReportHandler(reportDao));
-            addContextHandler(handlers, "/flute/report/get", new GetReportHandler(reportDao));
-            addContextHandler(handlers, "/flute/report/list", new ListReportsHandler(reportDao));
-            addContextHandler(handlers, "/flute/report/spec", new ViewReportConfigHandler(reportDao, metricIdentifierDao));
+            addContextHandler(handlers, "/flute/app/report/create", ModifyReportHandler.createMode(reportDao));
+            addContextHandler(handlers, "/flute/app/report/amend", ModifyReportHandler.amendMode(reportDao));
+            addContextHandler(handlers, "/flute/app/report/delete", new DeleteReportHandler(reportDao));
+            addContextHandler(handlers, "/flute/app/report/get", new GetReportHandler(reportDao));
+            addContextHandler(handlers, "/flute/app/report/list", new ListReportsHandler(reportDao));
+            addContextHandler(handlers, "/flute/app/report/spec", new ViewReportConfigHandler(reportDao, metricIdentifierDao));
 
             addContextHandler(handlers, "/flute/resources", resourceHandler);
         }

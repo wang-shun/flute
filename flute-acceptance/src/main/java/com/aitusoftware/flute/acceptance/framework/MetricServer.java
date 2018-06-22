@@ -36,9 +36,9 @@ public final class MetricServer
     private static final int SERVER_PORT = 15002;
     private static final String SERVER_ADDRESS = "http://" + SERVER_HOST + ":" + SERVER_PORT;
     private static final long WINDOW_DURATION_MILLIS = TimeUnit.SECONDS.toMillis(10L);
-    private static final String SLA_QUERY_URI = "/flute/query/slaReport/%s/%d/%s/%d";
-    private static final String METRIC_SEARCH_URI = "/flute/query/metricSearch/%s";
-    private static final String SLA_PERCENTILES_URI = "/flute/query/slaPercentiles/%s/%d/%s/%d";
+    private static final String SLA_QUERY_URI = "/flute/app/query/slaReport/%s/%d/%s/%d";
+    private static final String METRIC_SEARCH_URI = "/flute/app/query/metricSearch/%s";
+    private static final String SLA_PERCENTILES_URI = "/flute/app/query/slaPercentiles/%s/%d/%s/%d";
 
     public MetricServer()
     {
