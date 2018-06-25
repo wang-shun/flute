@@ -24,11 +24,16 @@ import static java.lang.Boolean.parseBoolean;
 public final class CacheConfig
 {
     private final boolean isCaching;
+    private final boolean storeCompressedHistograms;
     private final int capacity;
 
-    private CacheConfig(final boolean isCaching, final int capacity)
+    private CacheConfig(
+            final boolean isCaching,
+            final boolean storeCompressedHistograms,
+            final int capacity)
     {
         this.isCaching = isCaching;
+        this.storeCompressedHistograms = storeCompressedHistograms;
         this.capacity = capacity;
     }
 
@@ -36,6 +41,7 @@ public final class CacheConfig
     {
         return new CacheConfig(
                 parseBoolean(RequiredProperties.requiredProperty("flute.server.histogram.cache.enabled", properties)),
+                parseBoolean(RequiredProperties.requiredProperty("flute.server.histogram.compressed", properties)),
                 Integer.parseInt(properties.getProperty("flute.server.histogram.cache.capacity", "100")));
     }
 
@@ -47,5 +53,10 @@ public final class CacheConfig
     public int getCapacity()
     {
         return capacity;
+    }
+
+    public boolean storeCompressedHistograms()
+    {
+        return storeCompressedHistograms;
     }
 }

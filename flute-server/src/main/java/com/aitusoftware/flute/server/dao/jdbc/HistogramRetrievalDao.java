@@ -17,6 +17,7 @@ package com.aitusoftware.flute.server.dao.jdbc;
 
 import com.aitusoftware.flute.config.ConnectionFactory;
 import com.aitusoftware.flute.config.HistogramConfig;
+import com.aitusoftware.flute.server.cache.ByteBufferHistogram;
 import com.aitusoftware.flute.server.cache.CompressedHistogram;
 import com.aitusoftware.flute.server.cache.HistogramQueryFunction;
 import com.aitusoftware.flute.server.cache.UncompressedHistogram;
@@ -54,15 +55,17 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
     private final ConnectionFactory connectionFactory;
     private final int maxEncodedHistogramSize;
     private final HistogramAggregator aggregator;
+    private final boolean storeCompressedHistograms;
     private final HistogramConfig histogramConfig;
 
     public HistogramRetrievalDao(final ConnectionFactory connectionFactory, final HistogramConfig histogramConfig,
-                                 final int maxEncodedHistogramSize)
+                                 final int maxEncodedHistogramSize, final boolean storeCompressedHistograms)
     {
         this.connectionFactory = connectionFactory;
         this.histogramConfig = histogramConfig;
         this.maxEncodedHistogramSize = maxEncodedHistogramSize;
         this.aggregator = new HistogramAggregator(histogramConfig);
+        this.storeCompressedHistograms = storeCompressedHistograms;
     }
 
     @Override
@@ -127,17 +130,15 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
                             // read data
                         }
                         buffer.flip();
-                        final Histogram component =
-                                Histogram.decodeFromCompressedByteBuffer(buffer, histogramConfig.getMaxValue());
-                        component.setStartTimeStamp(resultSet.getLong("start_timestamp"));
-                        component.setEndTimeStamp(resultSet.getLong("end_timestamp"));
-                        resultList.add(new UncompressedHistogram(component));
+                        final long startTimestamp = resultSet.getLong("start_timestamp");
+                        final long endTimestamp = resultSet.getLong("end_timestamp");
+                        final CompressedHistogram histogram = createCompressedHistogram(startTimestamp, endTimestamp, buffer);
+                        resultList.add(histogram);
                     }
                     catch (IOException | DataFormatException | RuntimeException e)
                     {
                         throw new RuntimeException("Failed to read from stream", e);
                     }
-
                 }
 
                 if (noResults)
@@ -155,6 +156,22 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
         catch (SQLException e)
         {
             throw new RuntimeException("Query failed", e);
+        }
+    }
+
+    private CompressedHistogram createCompressedHistogram(final long startTimestamp, final long endTimestamp, final ByteBuffer buffer) throws DataFormatException
+    {
+        if (storeCompressedHistograms)
+        {
+            return new ByteBufferHistogram(buffer, startTimestamp, endTimestamp, histogramConfig);
+        }
+        else
+        {
+            final Histogram component =
+                    Histogram.decodeFromCompressedByteBuffer(buffer, histogramConfig.getMaxValue());
+            component.setStartTimeStamp(startTimestamp);
+            component.setEndTimeStamp(endTimestamp);
+            return new UncompressedHistogram(component);
         }
     }
 

@@ -81,7 +81,8 @@ final class HistogramQueryServer
         {
             final ConnectionFactory connectionFactory = new ConnectionFactory(databaseConfig);
             final HistogramRetrievalDao histogramRetrievalDao =
-                    new HistogramRetrievalDao(connectionFactory, histogramConfig, 1024 * 1024);
+                    new HistogramRetrievalDao(connectionFactory, histogramConfig,
+                            1024 * 1024, cacheConfig.storeCompressedHistograms());
             final MetricIdentifierDao metricIdentifierDao = new MetricIdentifierDao(connectionFactory);
             final ResourceHandler resourceHandler = new ResourceHandler();
             resourceHandler.setDirectoriesListed(false);
