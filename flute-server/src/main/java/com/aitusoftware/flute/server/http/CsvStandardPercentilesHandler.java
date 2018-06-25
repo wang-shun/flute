@@ -15,7 +15,7 @@
  */
 package com.aitusoftware.flute.server.http;
 
-import com.aitusoftware.flute.server.cache.HistogramCache;
+import com.aitusoftware.flute.server.cache.HistogramSource;
 import com.aitusoftware.flute.server.dao.jdbc.HistogramRetrievalDao;
 import com.aitusoftware.flute.server.dao.jdbc.MetricIdentifierDao;
 import com.aitusoftware.flute.server.query.Query;
@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import static java.util.Collections.singleton;
 
@@ -39,16 +38,17 @@ final class CsvStandardPercentilesHandler extends DefaultHandler
     private final HistogramRetrievalDao histogramRetrievalDao;
     private final MetricIdentifierDao metricIdentifierDao;
     private final boolean isAggregator;
-    private final HistogramCache histogramCache;
+    private final HistogramSource histogramSource;
 
     CsvStandardPercentilesHandler(final HistogramRetrievalDao histogramRetrievalDao,
                                   final MetricIdentifierDao metricIdentifierDao,
-                                  final boolean isAggregator, final Supplier<Histogram> histogramSupplier)
+                                  final boolean isAggregator,
+                                  final HistogramSource histogramSource)
     {
         this.histogramRetrievalDao = histogramRetrievalDao;
         this.metricIdentifierDao = metricIdentifierDao;
         this.isAggregator = isAggregator;
-        this.histogramCache = new HistogramCache(100, histogramRetrievalDao, System::currentTimeMillis, histogramSupplier);
+        this.histogramSource = histogramSource;
     }
 
     @Override
@@ -98,7 +98,7 @@ final class CsvStandardPercentilesHandler extends DefaultHandler
             final Set<String> metricIdentifiers,
             final String metricKey)
     {
-        final Histogram histogram = histogramCache.getCurrentHistogram(metricIdentifiers,
+        final Histogram histogram = histogramSource.getCurrentHistogram(metricIdentifiers,
                 query.getDuration(), query.getDurationUnit(), metricKey);
         StandardPercentilesHistogramSummaryHandler.csv(writer).onRecord(query.getMetricKey(), histogram.getStartTimeStamp(), histogram);
     }

@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
-public final class HistogramCache
+public final class HistogramCache implements HistogramSource
 {
     private final int maxEntries;
     private final ConcurrentMap<MapKey, RollingWindowHistogram> cache;
@@ -47,6 +47,7 @@ public final class HistogramCache
         this.histogramSupplier = histogramSupplier;
     }
 
+    @Override
     public Histogram getCurrentHistogram(final Set<String> metricIdentifiers, final long windowDuration, final TimeUnit durationUnit, final String metricKey)
     {
         final Histogram histogram = cache.computeIfAbsent(new MapKey(metricIdentifiers, windowDuration, durationUnit, metricKey), this::create).getHistogram();
@@ -77,58 +78,5 @@ public final class HistogramCache
     {
         return new RollingWindowHistogram(mapKey.metricIdentifiers, mapKey.windowDuration,
                 mapKey.durationUnit, mapKey.metricKey, queryFunction, clock, histogramSupplier);
-    }
-
-
-    private static final class MapKey
-    {
-        private final Set<String> metricIdentifiers;
-        private final long windowDuration;
-        private final TimeUnit durationUnit;
-        private final transient String metricKey;
-
-        private MapKey(final Set<String> metricIdentifiers, final long windowDuration,
-                       final TimeUnit durationUnit, final String metricKey)
-        {
-            this.metricIdentifiers = metricIdentifiers;
-            this.windowDuration = windowDuration;
-            this.durationUnit = durationUnit;
-            this.metricKey = metricKey;
-        }
-
-        @Override
-        public boolean equals(final Object o)
-        {
-            if (this == o)
-            {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass())
-            {
-                return false;
-            }
-
-            final MapKey mapKey = (MapKey) o;
-
-            if (windowDuration != mapKey.windowDuration)
-            {
-                return false;
-            }
-            if (metricIdentifiers != null ? !metricIdentifiers.equals(mapKey.metricIdentifiers) : mapKey.metricIdentifiers != null)
-            {
-                return false;
-            }
-            return durationUnit == mapKey.durationUnit;
-
-        }
-
-        @Override
-        public int hashCode()
-        {
-            int result = metricIdentifiers != null ? metricIdentifiers.hashCode() : 0;
-            result = 31 * result + (int) (windowDuration ^ (windowDuration >>> 32));
-            result = 31 * result + (durationUnit != null ? durationUnit.hashCode() : 0);
-            return result;
-        }
     }
 }

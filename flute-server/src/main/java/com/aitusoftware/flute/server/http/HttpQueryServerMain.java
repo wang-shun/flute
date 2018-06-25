@@ -38,10 +38,11 @@ public final class HttpQueryServerMain
         final ServerConfig serverConfig = ServerConfig.fromFluteProperties(properties);
         final HistogramConfig histogramConfig = HistogramConfig.fromFluteProperties(properties);
         final DatabaseConfig reportDatabaseConfig = DatabaseConfig.fromFluteProperties(properties, "reports");
+        final CacheConfig cacheConfig = CacheConfig.fromFluteProperties(properties);
 
         final HistogramQueryServer queryServer =
                 new HistogramQueryServer(serverConfig, metricsDatabaseConfig,
-                        histogramConfig, reportDatabaseConfig);
+                        histogramConfig, reportDatabaseConfig, cacheConfig);
         queryServer.run();
     }
 }
