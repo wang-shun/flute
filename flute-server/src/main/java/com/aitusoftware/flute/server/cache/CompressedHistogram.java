@@ -23,5 +23,5 @@ public interface CompressedHistogram
 
     long getEndTimestamp();
 
-    Histogram unpack(final Histogram target);
+    Histogram unpack();
 }

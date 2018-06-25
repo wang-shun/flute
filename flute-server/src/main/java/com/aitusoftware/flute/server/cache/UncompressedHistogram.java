@@ -43,7 +43,7 @@ public final class UncompressedHistogram implements CompressedHistogram
     }
 
     @Override
-    public Histogram unpack(final Histogram target)
+    public Histogram unpack()
     {
         return histogram;
     }

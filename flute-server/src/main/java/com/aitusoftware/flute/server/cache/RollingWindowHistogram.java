@@ -69,7 +69,7 @@ public final class RollingWindowHistogram
                     windowEnd, System.currentTimeMillis());
             for (final CompressedHistogram compressed : updates)
             {
-                final Histogram component = compressed.unpack(null);
+                final Histogram component = compressed.unpack();
                 if(component.getTotalCount() != 0L)
                 {
                     aggregate.add(component);

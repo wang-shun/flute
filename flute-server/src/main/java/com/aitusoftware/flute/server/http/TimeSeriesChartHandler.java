@@ -107,7 +107,7 @@ final class TimeSeriesChartHandler extends DefaultHandler
 
         for (int i = 0; i < histograms.size(); i++)
         {
-            final Histogram histogram = histograms.get(i).unpack(null);
+            final Histogram histogram = histograms.get(i).unpack();
             if (i != 0)
             {
                 writer.append(',');
