@@ -111,8 +111,8 @@ final class HistogramQueryServer
             final ReportDao reportDao = new ReportDao(new ConnectionFactory(reportDatabaseConfig));
             addContextHandler(handlers, "/flute/app/report/spec", new ViewReportConfigHandler(reportDao, metricIdentifierDao));
 
-            final HistogramSource histogramSource = new HistogramSourceProvider(100, histogramRetrievalDao,
-                    histogramConfig, histogramRetrievalDao, cacheConfig.isCaching()).get();
+            final HistogramSource histogramSource = new HistogramSourceProvider(histogramRetrievalDao,
+                    histogramConfig, histogramRetrievalDao, cacheConfig).get();
             addContextHandler(handlers, "/flute/app/query/slaReport", new SlaReportHandler(histogramRetrievalDao, metricIdentifierDao, false, histogramSource));
             addContextHandler(handlers, "/flute/app/query/slaPercentiles", new SlaPercentileChartHandler(histogramRetrievalDao, metricIdentifierDao, false, histogramSource));
             addContextHandler(handlers, "/flute/app/query/standardPercentilesCsv", new CsvStandardPercentilesHandler(histogramRetrievalDao, metricIdentifierDao, false, histogramSource));

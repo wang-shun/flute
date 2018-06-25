@@ -33,7 +33,6 @@ public final class HistogramCache implements HistogramSource
     private final LongSupplier clock;
     private final Supplier<Histogram> histogramSupplier;
 
-
     public HistogramCache(
             final int maxEntries,
             final HistogramQueryFunction queryFunction,
@@ -78,5 +77,57 @@ public final class HistogramCache implements HistogramSource
     {
         return new RollingWindowHistogram(mapKey.metricIdentifiers, mapKey.windowDuration,
                 mapKey.durationUnit, mapKey.metricKey, queryFunction, clock, histogramSupplier);
+    }
+
+    private static final class MapKey
+    {
+        private final Set<String> metricIdentifiers;
+        private final long windowDuration;
+        private final TimeUnit durationUnit;
+        private final transient String metricKey;
+
+        private MapKey(final Set<String> metricIdentifiers, final long windowDuration,
+               final TimeUnit durationUnit, final String metricKey)
+        {
+            this.metricIdentifiers = metricIdentifiers;
+            this.windowDuration = windowDuration;
+            this.durationUnit = durationUnit;
+            this.metricKey = metricKey;
+        }
+
+        @Override
+        public boolean equals(final Object o)
+        {
+            if (this == o)
+            {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass())
+            {
+                return false;
+            }
+
+            final MapKey mapKey = (MapKey) o;
+
+            if (windowDuration != mapKey.windowDuration)
+            {
+                return false;
+            }
+            if (metricIdentifiers != null ? !metricIdentifiers.equals(mapKey.metricIdentifiers) : mapKey.metricIdentifiers != null)
+            {
+                return false;
+            }
+            return durationUnit == mapKey.durationUnit;
+
+        }
+
+        @Override
+        public int hashCode()
+        {
+            int result = metricIdentifiers != null ? metricIdentifiers.hashCode() : 0;
+            result = 31 * result + (int) (windowDuration ^ (windowDuration >>> 32));
+            result = 31 * result + (durationUnit != null ? durationUnit.hashCode() : 0);
+            return result;
+        }
     }
 }
