@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -33,7 +34,7 @@ public final class RollingWindowHistogramTest
     private static final long START_TIME = 1234567890000L;
     private static final TimeUnit DURATION_UNIT = TimeUnit.MINUTES;
     private static final long WINDOW_DURATION = 10L;
-    private final List<Histogram> queryResponse = new LinkedList<>();
+    private final List<CompressedHistogram> queryResponse = new LinkedList<>();
     private final Set<String> metricIdentifiers = new HashSet<>(Arrays.asList("one", "two"));
     private long currentTime = START_TIME;
     private final RollingWindowHistogram rollingWindowHistogram =
@@ -145,7 +146,7 @@ public final class RollingWindowHistogramTest
     private void setQueryResults(final Histogram... elements)
     {
         queryResponse.clear();
-        queryResponse.addAll(Arrays.asList(elements));
+        queryResponse.addAll(Arrays.stream(elements).map(UncompressedHistogram::new).collect(Collectors.toList()));
     }
 
     private Histogram createHistogram(final int numberOfDataPoints, final long startTime, final long endTime)
@@ -166,7 +167,7 @@ public final class RollingWindowHistogramTest
         return currentTime;
     }
 
-    private List<Histogram> queryFunction(final Set<String> metricIdentifiers, final String metricKey,
+    private List<CompressedHistogram> queryFunction(final Set<String> metricIdentifiers, final String metricKey,
                                           final long startTimestamp, final long endTimestamp)
     {
         capturedQueryRequestTimestamp = startTimestamp;

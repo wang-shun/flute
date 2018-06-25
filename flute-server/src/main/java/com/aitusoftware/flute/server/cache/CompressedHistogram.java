@@ -15,13 +15,13 @@
  */
 package com.aitusoftware.flute.server.cache;
 
-import java.util.List;
-import java.util.Set;
+import org.HdrHistogram.Histogram;
 
-@FunctionalInterface
-public interface HistogramQueryFunction
+public interface CompressedHistogram
 {
-    List<CompressedHistogram> query(
-            final Set<String> identifiers, final String metricKey, final long selectionStartTime,
-            final long selectionEndTime);
+    long getStartTimestamp();
+
+    long getEndTimestamp();
+
+    Histogram unpack(final Histogram target);
 }

@@ -65,10 +65,11 @@ public final class RollingWindowHistogram
             {
                 windowEnd = clock.getAsLong() - windowDurationUnit.toMillis(windowDuration);
             }
-            final List<Histogram> updates = updatedHistogramQuery.query(metricIdentifiers, metricKey,
+            final List<CompressedHistogram> updates = updatedHistogramQuery.query(metricIdentifiers, metricKey,
                     windowEnd, System.currentTimeMillis());
-            for (final Histogram component : updates)
+            for (final CompressedHistogram compressed : updates)
             {
+                final Histogram component = compressed.unpack(null);
                 if(component.getTotalCount() != 0L)
                 {
                     aggregate.add(component);

@@ -15,6 +15,7 @@
  */
 package com.aitusoftware.flute.server.http;
 
+import com.aitusoftware.flute.server.cache.CompressedHistogram;
 import com.aitusoftware.flute.server.dao.jdbc.HistogramRetrievalDao;
 import com.aitusoftware.flute.server.dao.jdbc.MetricIdentifierDao;
 import com.aitusoftware.flute.server.query.Query;
@@ -84,7 +85,7 @@ final class TimeSeriesChartHandler extends DefaultHandler
             metricIdentifiers = singleton(query.getMetricKey());
         }
 
-        final List<Histogram> histograms = histogramRetrievalDao.query(metricIdentifiers, query.getMetricKey(),
+        final List<CompressedHistogram> histograms = histogramRetrievalDao.query(metricIdentifiers, query.getMetricKey(),
                 query.getStartMillis(), query.getEndMillis());
 
         if(LOGGER.isDebugEnabled())
@@ -100,13 +101,13 @@ final class TimeSeriesChartHandler extends DefaultHandler
         writer.flush();
     }
 
-    private void writeHistograms(final List<Histogram> histograms, final PrintWriter writer)
+    private void writeHistograms(final List<CompressedHistogram> histograms, final PrintWriter writer)
     {
         writer.append("[");
 
         for (int i = 0; i < histograms.size(); i++)
         {
-            final Histogram histogram = histograms.get(i);
+            final Histogram histogram = histograms.get(i).unpack(null);
             if (i != 0)
             {
                 writer.append(',');

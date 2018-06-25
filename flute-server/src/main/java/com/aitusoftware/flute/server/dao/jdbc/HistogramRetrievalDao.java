@@ -17,7 +17,9 @@ package com.aitusoftware.flute.server.dao.jdbc;
 
 import com.aitusoftware.flute.config.ConnectionFactory;
 import com.aitusoftware.flute.config.HistogramConfig;
+import com.aitusoftware.flute.server.cache.CompressedHistogram;
 import com.aitusoftware.flute.server.cache.HistogramQueryFunction;
+import com.aitusoftware.flute.server.cache.UncompressedHistogram;
 import com.aitusoftware.flute.server.dao.HistogramAggregator;
 import com.aitusoftware.flute.server.query.FullHistogramHandler;
 import com.aitusoftware.flute.server.query.Query;
@@ -64,7 +66,7 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
     }
 
     @Override
-    public List<Histogram> query(final Set<String> identifiers, final String metricKey, final long selectionStartTime,
+    public List<CompressedHistogram> query(final Set<String> identifiers, final String metricKey, final long selectionStartTime,
                                  final long selectionEndTime)
     {
         return queryForHistograms(identifiers, DETAIL_QUERY_BASE + DETAIL_QUERY_CLAUSE, selectionStartTime, selectionEndTime);
@@ -95,7 +97,7 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
         return queryForHistogram(identifiers, handler, sql, query.getStartMillis(), query.getEndMillis(), query.getMetricKey());
     }
 
-    private List<Histogram> queryForHistograms(final Set<String> identifiers, final String sql,
+    private List<CompressedHistogram> queryForHistograms(final Set<String> identifiers, final String sql,
                                                final long startMillis, final long endMillis)
     {
         try (
@@ -109,7 +111,7 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
                 BUFFER.set(ByteBuffer.allocate(maxEncodedHistogramSize));
             }
             final ByteBuffer buffer = BUFFER.get();
-            final List<Histogram> resultList = new ArrayList<>();
+            final List<CompressedHistogram> resultList = new ArrayList<>();
             boolean noResults = true;
             try
             {
@@ -129,7 +131,7 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
                                 Histogram.decodeFromCompressedByteBuffer(buffer, histogramConfig.getMaxValue());
                         component.setStartTimeStamp(resultSet.getLong("start_timestamp"));
                         component.setEndTimeStamp(resultSet.getLong("end_timestamp"));
-                        resultList.add(component);
+                        resultList.add(new UncompressedHistogram(component));
                     }
                     catch (IOException | DataFormatException | RuntimeException e)
                     {
