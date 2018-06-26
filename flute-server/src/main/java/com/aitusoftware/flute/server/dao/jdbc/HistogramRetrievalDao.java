@@ -141,7 +141,7 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
                     }
                 }
 
-                if (noResults)
+                if (noResults && LOGGER.isDebugEnabled())
                 {
                     logDataTimestamps(DEBUG_QUERY, identifiers, connection);
                 }
@@ -181,16 +181,29 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
         try (final Statement statement = connection.createStatement();
                 final ResultSet resultSet = statement.executeQuery(String.format(sql, identifierList(identifiers))))
         {
+            long first = Long.MAX_VALUE;
+            long last = Long.MIN_VALUE;
+            int totalHistograms = 0;
             while (resultSet.next())
             {
-                if (LOGGER.isDebugEnabled())
+                final long startTimestamp = resultSet.getLong("start_timestamp");
+                if (startTimestamp < first)
                 {
-                    LOGGER.debug("Found data for {}, from {} to {}, total {}",
-                            resultSet.getString("identifier"),
-                            Instant.ofEpochMilli(resultSet.getLong("start_timestamp")),
-                            Instant.ofEpochMilli(resultSet.getLong("end_timestamp")),
-                            resultSet.getLong("total_count"));
+                    first = startTimestamp;
                 }
+                if (startTimestamp > last)
+                {
+                    last = startTimestamp;
+                }
+                totalHistograms++;
+            }
+            if (LOGGER.isDebugEnabled())
+            {
+                LOGGER.debug("Found data for {}, from {} to {}, total {} histograms",
+                        resultSet.getString("identifier"),
+                        Instant.ofEpochMilli(first),
+                        Instant.ofEpochMilli(last),
+                        totalHistograms);
             }
         }
     }

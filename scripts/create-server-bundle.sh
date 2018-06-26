@@ -15,17 +15,18 @@ ARTEFACT_NAME="$ARTEFACT_DIR/flute-server-bundle-$VERSION.zip"
 
 TMP_DIR=$(mktemp -d)
 LIB_DIR="$TMP_DIR/lib"
+BIN_DIR="$TMP_DIR/bin"
 SCRIPT_DIR="$TMP_DIR/script"
 ASSET_DIR="$TMP_DIR/assets"
 mkdir $LIB_DIR
+mkdir $BIN_DIR
 mkdir $SCRIPT_DIR
 mkdir -p $ARTEFACT_DIR
 mkdir -p $ASSET_DIR
 rm "$ARTEFACT_NAME"
 
-cp "./flute-persistor/build/libs/flute-persistor-all-$VERSION.jar" $LIB_DIR
-cp "./flute-server/build/libs/flute-server-all-$VERSION.jar" $LIB_DIR
-cp "./flute-common/build/libs/flute-common-all-$VERSION.jar" $LIB_DIR
+cp "./flute-persistor/build/libs/flute-persistor-all-$VERSION.jar" $BIN_DIR
+cp "./flute-server/build/libs/flute-server-all-$VERSION.jar" $BIN_DIR
 
 cp scripts/start-metric-server.sh $SCRIPT_DIR
 cp scripts/start-persistor.sh $SCRIPT_DIR
