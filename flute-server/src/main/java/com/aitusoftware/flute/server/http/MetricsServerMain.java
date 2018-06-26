@@ -22,7 +22,7 @@ import com.aitusoftware.flute.server.config.ServerConfig;
 import java.io.FileReader;
 import java.util.Properties;
 
-public final class HttpQueryServerMain
+public final class MetricsServerMain
 {
     public static void main(final String[] args) throws Exception
     {

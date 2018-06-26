@@ -19,6 +19,7 @@ import com.aitusoftware.flute.config.ConnectionFactory;
 import com.aitusoftware.flute.config.DatabaseConfig;
 import com.aitusoftware.flute.server.config.ServerConfig;
 import com.aitusoftware.flute.server.dao.jdbc.MetricIdentifierDao;
+import com.aitusoftware.flute.server.http.MetricIdentifierSearchHandler;
 import com.aitusoftware.flute.server.reporting.dao.ReportDao;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
@@ -102,6 +103,7 @@ final class ReportAdminServer
             addContextHandler(handlers, "/flute/app/report/get", new GetReportHandler(reportDao));
             addContextHandler(handlers, "/flute/app/report/list", new ListReportsHandler(reportDao));
             addContextHandler(handlers, "/flute/app/report/spec", new ViewReportConfigHandler(reportDao, metricIdentifierDao));
+            addContextHandler(handlers, "/flute/app/query/metricSearch", new MetricIdentifierSearchHandler(metricIdentifierDao));
 
             addContextHandler(handlers, "/flute/resources", resourceHandler);
         }

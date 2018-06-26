@@ -99,7 +99,7 @@ flute.server.httpPort=15002
    4. Execute command:
 ```
 java -cp flute-server-all-0.1.2.jar \
-com.aitusoftware.flute.server.http.HttpQueryServerMain $CONFIG_FILE
+com.aitusoftware.flute.server.http.MetricsServerMain $CONFIG_FILE
 ```
 
 # Generating data

@@ -15,4 +15,4 @@ java  \
 -cp "$BIN_DIR/flute-server-all-FLUTE_VERSION.jar:$LIB_DIR/*" \
 -Djava.net.preferIPv4Stack=true \
 -Dlog4j.configuration=file://$SCRIPT_DIR/log4j.xml \
-com.aitusoftware.flute.server.http.HttpQueryServerMain $CONFIG_FILE
+com.aitusoftware.flute.server.http.MetricsServerMain $CONFIG_FILE

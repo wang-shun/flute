@@ -11,5 +11,5 @@ ENV CONFIG_FILE deploy/acceptance-test-flute.properties
 
 CMD java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006 -cp deploy/flute-server-all-0.1.2.jar \
     -Dlog4j.configuration=logging/log4j.xml -Dflute.db.url=jdbc:h2:${INTEGRATION_DB_PORT}/flute-db \
-    com.aitusoftware.flute.server.http.HttpQueryServerMain $CONFIG_FILE
+    com.aitusoftware.flute.server.http.MetricsServerMain $CONFIG_FILE
 
