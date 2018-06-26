@@ -16,7 +16,17 @@
     limitations under the License.
 -->
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
-    <!-- TODO configure file appender and rolling policy -->
+    <appender name="file" class="org.apache.log4j.rolling.RollingFileAppender">
+        <param name="threshold" value="debug"/>
+        <rollingPolicy name="file"
+                       class="org.apache.log4j.rolling.TimeBasedRollingPolicy">
+            <param name="FileNamePattern" value="${log.dir:-logs}/${log.name:-all}-%d{yyyy-MM-dd-HH}.log"/>
+        </rollingPolicy>
+        <param name="MaxBackupIndex" value="4"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d [%t] %-5p %c - %m%n"/>
+        </layout>
+    </appender>
     <appender name="console" class="org.apache.log4j.ConsoleAppender">
         <param name="Target" value="System.out"/>
         <layout class="org.apache.log4j.PatternLayout">
@@ -35,7 +45,7 @@
 
     <root>
         <priority value ="debug" />
-        <appender-ref ref="console" />
+        <appender-ref ref="file"/>
     </root>
 
 </log4j:configuration>
