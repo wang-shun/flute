@@ -16,5 +16,5 @@ java  \
 -cp "$BIN_DIR/flute-server-all-FLUTE_VERSION.jar:$LIB_DIR/*" \
 -Djava.net.preferIPv4Stack=true \
 -Dlog.dir=$LOG_DIR -Dlog.name=metric-server \
--Dlog4j.configuration=file://$SCRIPT_DIR/log4j.xml \
+-Dlogback.configurationFile=$SCRIPT_DIR/logback.xml \
 com.aitusoftware.flute.server.http.MetricsServerMain $CONFIG_FILE

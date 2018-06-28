@@ -36,7 +36,7 @@ cp config/metrics-server-template.properties $SCRIPT_DIR
 cp config/report-server-template.properties $SCRIPT_DIR
 cp config/persistor-template.properties $SCRIPT_DIR
 
-cp config/log4j.xml $SCRIPT_DIR
+cp config/logback.xml $SCRIPT_DIR
 
 cp -r flute-server/src/main/resources/ui $ASSET_DIR/
 

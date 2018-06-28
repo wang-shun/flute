@@ -16,5 +16,5 @@ java  \
 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5007 \
 -cp "$BIN_DIR/flute-server-all-FLUTE_VERSION.jar:$LIB_DIR/*"  -Djava.net.preferIPv4Stack=true \
 -Dlog.dir=$LOG_DIR -Dlog.name=report-server \
--Dlog4j.configuration=file://$SCRIPT_DIR/log4j.xml \
+-Dlogback.configurationFile=$SCRIPT_DIR/logback.xml \
 com.aitusoftware.flute.server.reporting.http.ReportAdminServerMain $CONFIG_FILE

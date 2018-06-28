@@ -16,5 +16,5 @@ java  \
 -cp "$BIN_DIR/flute-persistor-all-FLUTE_VERSION.jar:$LIB_DIR/*" \
 -Djava.net.preferIPv4Stack=true \
 -Dlog.dir=$LOG_DIR -Dlog.name=persistor \
--Dlog4j.configuration=file://$SCRIPT_DIR/log4j.xml \
+-Dlogback.configurationFile=$SCRIPT_DIR/logback.xml \
 com.aitusoftware.flute.archive.FluteMetricsPersistorMain $CONFIG_FILE
