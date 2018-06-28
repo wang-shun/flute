@@ -200,7 +200,7 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
             if (LOGGER.isDebugEnabled())
             {
                 LOGGER.debug("Found data for {}, from {} to {}, total {} histograms",
-                        resultSet.getString("identifier"),
+                        identifiers,
                         Instant.ofEpochMilli(first),
                         Instant.ofEpochMilli(last),
                         totalHistograms);
