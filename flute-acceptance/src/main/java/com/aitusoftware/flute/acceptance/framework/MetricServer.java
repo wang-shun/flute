@@ -39,6 +39,7 @@ public final class MetricServer
     private static final String SLA_QUERY_URI = "/flute/app/query/slaReport/%s/%d/%s/%d";
     private static final String METRIC_SEARCH_URI = "/flute/app/query/metricSearch/%s";
     private static final String SLA_PERCENTILES_URI = "/flute/app/query/slaPercentiles/%s/%d/%s/%d";
+    private static final String LIST_REPORTS_URI = "/flute/app/query/listReports";
 
     public MetricServer()
     {
@@ -71,6 +72,13 @@ public final class MetricServer
         final String url = String.format(SERVER_ADDRESS + METRIC_SEARCH_URI, searchSpec);
         final List<String> matchingMetricIdentifiers = new Gson().fromJson(new InputStreamReader(get(url)), List.class);
         return new HashSet<>(matchingMetricIdentifiers);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> waitForReport()
+    {
+        return new Gson().fromJson(new InputStreamReader(
+                get(SERVER_ADDRESS + LIST_REPORTS_URI)), List.class);
     }
 
     private List querySlaReport(final String metricName)

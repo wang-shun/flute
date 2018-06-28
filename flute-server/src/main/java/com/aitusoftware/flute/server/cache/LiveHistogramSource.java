@@ -26,8 +26,8 @@ public final class LiveHistogramSource implements HistogramSource
     private final HistogramQueryFunction queryFunction;
     private final Supplier<Histogram> histogramSupplier;
 
-    public LiveHistogramSource(final HistogramQueryFunction queryFunction,
-                               final Supplier<Histogram> histogramSupplier)
+    LiveHistogramSource(final HistogramQueryFunction queryFunction,
+                        final Supplier<Histogram> histogramSupplier)
     {
         this.queryFunction = queryFunction;
         this.histogramSupplier = histogramSupplier;

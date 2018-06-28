@@ -24,6 +24,7 @@ import com.aitusoftware.flute.server.config.ServerConfig;
 import com.aitusoftware.flute.server.dao.jdbc.HistogramRetrievalDao;
 import com.aitusoftware.flute.server.dao.jdbc.MetricIdentifierDao;
 import com.aitusoftware.flute.server.reporting.dao.ReportDao;
+import com.aitusoftware.flute.server.reporting.http.ListReportsHandler;
 import com.aitusoftware.flute.server.reporting.http.ViewReportConfigHandler;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
@@ -111,6 +112,7 @@ final class HistogramQueryServer
             }
             final ReportDao reportDao = new ReportDao(new ConnectionFactory(reportDatabaseConfig));
             addContextHandler(handlers, "/flute/app/report/spec", new ViewReportConfigHandler(reportDao, metricIdentifierDao));
+            addContextHandler(handlers, "/flute/app/query/listReports", new ListReportsHandler(reportDao));
 
             final HistogramSource histogramSource = new HistogramSourceProvider(histogramRetrievalDao,
                     histogramConfig, histogramRetrievalDao, cacheConfig).get();
