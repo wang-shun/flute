@@ -6,13 +6,11 @@ import com.aitusoftware.flute.acceptance.framework.Threshold;
 import com.aitusoftware.flute.acceptance.framework.TimeWindow;
 import com.aitusoftware.flute.acceptance.framework.Waiter;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-@Ignore
 public final class ListAvailableReportsTest
 {
     private static final String REPORT_NAME = "test-report";
