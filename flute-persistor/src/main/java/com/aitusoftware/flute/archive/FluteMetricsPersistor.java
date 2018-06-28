@@ -28,6 +28,7 @@ import com.aitusoftware.flute.receive.ReceiverProcess;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.SocketAddress;
+import java.net.StandardSocketOptions;
 import java.nio.channels.ServerSocketChannel;
 import java.sql.SQLException;
 import java.util.function.Consumer;
@@ -87,6 +88,7 @@ public final class FluteMetricsPersistor
     {
         final ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
         serverSocketChannel.configureBlocking(true);
+        serverSocketChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
         return serverSocketChannel.bind(socketAddress);
     }
 }

@@ -150,11 +150,13 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
             }
             catch (final SQLException e)
             {
+                LOGGER.warn("Query failed", e);
                 throw new RuntimeException("Query failed", e);
             }
         }
         catch (SQLException e)
         {
+            LOGGER.warn("Query failed", e);
             throw new RuntimeException("Query failed", e);
         }
     }
@@ -227,6 +229,7 @@ public final class HistogramRetrievalDao implements HistogramQueryFunction
         }
         catch (SQLException e)
         {
+            LOGGER.warn("Query failed", e);
             throw new RuntimeException("Query failed", e);
         }
     }

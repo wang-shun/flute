@@ -17,6 +17,8 @@ package com.aitusoftware.flute.server.reporting.dao;
 
 import com.aitusoftware.flute.config.ConnectionFactory;
 import com.aitusoftware.flute.server.reporting.domain.ReportSpecification;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,6 +30,7 @@ import java.util.regex.Pattern;
 
 public final class ReportDao
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReportDao.class);
     private static final String INSERT_SQL = "INSERT INTO aggregate_report " +
             "(name, selectorPattern, timeWindows, thresholds) VALUES (?,?,?,?)";
     private static final String AMEND_SQL = "UPDATE aggregate_report " +
@@ -62,6 +65,7 @@ public final class ReportDao
         }
         catch(final SQLException e)
         {
+            LOGGER.warn("Query failed", e);
             throw new RuntimeException("Query failed", e);
         }
     }
@@ -85,6 +89,7 @@ public final class ReportDao
         }
         catch(final SQLException e)
         {
+            LOGGER.warn("Query failed", e);
             throw new RuntimeException("Query failed", e);
         }
     }
@@ -104,6 +109,7 @@ public final class ReportDao
         }
         catch(final SQLException e)
         {
+            LOGGER.warn("Query failed", e);
             throw new RuntimeException("Query failed", e);
         }
     }
@@ -123,6 +129,7 @@ public final class ReportDao
         }
         catch(final SQLException e)
         {
+            LOGGER.warn("Query failed", e);
             throw new RuntimeException("Query failed", e);
         }
         return reportNames;
@@ -150,6 +157,7 @@ public final class ReportDao
         }
         catch(final SQLException e)
         {
+            LOGGER.warn("Query failed", e);
             throw new RuntimeException("Query failed", e);
         }
     }

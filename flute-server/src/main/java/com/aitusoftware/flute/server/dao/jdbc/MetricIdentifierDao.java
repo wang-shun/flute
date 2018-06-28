@@ -16,6 +16,8 @@
 package com.aitusoftware.flute.server.dao.jdbc;
 
 import com.aitusoftware.flute.config.ConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -27,6 +29,7 @@ import java.util.regex.Pattern;
 
 public final class MetricIdentifierDao
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetricIdentifierDao.class);
     private final ConnectionFactory connectionFactory;
 
     public MetricIdentifierDao(final ConnectionFactory connectionFactory)
@@ -54,7 +57,8 @@ public final class MetricIdentifierDao
         }
         catch(final SQLException e)
         {
-            throw new RuntimeException("Query failed", e);
+            LOGGER.warn("Query failed", e);
+            throw new RuntimeException("Query failed: " + e.getMessage(), e);
         }
         return matchingIdentifiers;
     }

@@ -18,6 +18,8 @@ package com.aitusoftware.flute.server.dao;
 import com.aitusoftware.flute.config.HistogramConfig;
 import com.aitusoftware.flute.server.query.FullHistogramHandler;
 import org.HdrHistogram.Histogram;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +31,7 @@ import java.util.zip.DataFormatException;
 
 public final class HistogramAggregator
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HistogramAggregator.class);
     private final HistogramConfig histogramConfig;
 
     public HistogramAggregator(final HistogramConfig histogramConfig)
@@ -83,6 +86,7 @@ public final class HistogramAggregator
         }
         catch (final IOException e)
         {
+            LOGGER.warn("Query failed", e);
             throw new RuntimeException("Query failed", e);
         }
     }

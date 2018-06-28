@@ -95,8 +95,16 @@ public final class HistogramConnectionHandler
             {
                 final SocketChannel clientChannel = serverSocketChannel.accept();
 
+                LOGGER.debug("Accepted connection from {}", clientChannel);
+
                 clientChannel.configureBlocking(false);
-                clientChannel.register(selector, SelectionKey.OP_READ, new StreamingHistogramReceiver(histogramHandler, highestTrackableValue));
+                // TODO ignored value
+                // TODO review selection ops
+                clientChannel.register(selector,
+                        SelectionKey.OP_READ |
+                                SelectionKey.OP_WRITE |
+                                SelectionKey.OP_CONNECT,
+                        new StreamingHistogramReceiver(histogramHandler, highestTrackableValue));
                 connectedSockets.incrementAndGet();
             }
             catch (final Exception e)
@@ -130,7 +138,8 @@ public final class HistogramConnectionHandler
             {
                 try
                 {
-                    if (selector.select(100) != 0)
+                    int selected = selector.select(10_000);
+                    if (selected != 0)
                     {
                         processSelectedKeys();
                     }
@@ -150,6 +159,7 @@ public final class HistogramConnectionHandler
             {
                 final SelectionKey selectedKey = iterator.next();
                 final SelectableChannel channel = selectedKey.channel();
+                LOGGER.debug("Selected channel {}", channel);
                 try
                 {
                     final StreamingHistogramReceiver receiver = (StreamingHistogramReceiver) selectedKey.attachment();

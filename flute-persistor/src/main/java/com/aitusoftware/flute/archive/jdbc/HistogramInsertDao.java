@@ -84,6 +84,7 @@ public final class HistogramInsertDao implements HistogramHandler
             {
                 throw new SQLException("Failed to insert data", statement.getWarnings());
             }
+            connection.commit();
 
             if(LOGGER.isDebugEnabled())
             {
