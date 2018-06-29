@@ -53,6 +53,10 @@ public final class StreamingHistogramReceiver
         {
             return ReadResult.END_OF_STREAM;
         }
+        else if (read == 0)
+        {
+            return ReadResult.NO_DATA;
+        }
 
         buffer.flip();
         if(!hasValidatedVersion && buffer.remaining() >= VersionCodec.FORMATTED_VERSION_LENGTH)

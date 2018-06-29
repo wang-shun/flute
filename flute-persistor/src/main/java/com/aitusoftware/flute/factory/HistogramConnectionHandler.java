@@ -134,6 +134,14 @@ public final class HistogramConnectionHandler
                     {
                         processSelectedKeys();
                     }
+                    else
+                    {
+                        final Set<SelectionKey> allKeys = selector.keys();
+                        for (SelectionKey key : allKeys)
+                        {
+                            processChannel(key, key.channel(), false);
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
@@ -152,29 +160,45 @@ public final class HistogramConnectionHandler
                 final SelectableChannel channel = selectedKey.channel();
                 try
                 {
-                    final StreamingHistogramReceiver receiver = (StreamingHistogramReceiver) selectedKey.attachment();
-
-                    final ReadResult readResult = receiver.readFrom((ReadableByteChannel) channel,
-                            (InetSocketAddress) ((SocketChannel) channel).getRemoteAddress());
-
-                    if(readResult == ReadResult.END_OF_STREAM)
-                    {
-                        if(LOGGER.isDebugEnabled())
-                        {
-                            LOGGER.debug("Inbound connection was closed: {}", ((SocketChannel) channel).getRemoteAddress());
-                        }
-                        closeFunction.accept(selectedKey, channel);
-                    }
-                }
-                catch (final Exception e)
-                {
-                    closeFunction.accept(selectedKey, channel);
-                    exceptionConsumer.accept(e);
+                    processChannel(selectedKey, channel, true);
                 }
                 finally
                 {
                     iterator.remove();
                 }
+            }
+        }
+
+        private void processChannel(final SelectionKey selectedKey, final SelectableChannel channel,
+                                    final boolean wasSelected)
+        {
+            try
+            {
+                final StreamingHistogramReceiver receiver = (StreamingHistogramReceiver) selectedKey.attachment();
+
+                final ReadResult readResult = receiver.readFrom((ReadableByteChannel) channel,
+                        (InetSocketAddress) ((SocketChannel) channel).getRemoteAddress());
+
+                if (readResult == ReadResult.END_OF_STREAM)
+                {
+                    if (LOGGER.isDebugEnabled())
+                    {
+                        LOGGER.debug("Inbound connection was closed: {}", ((SocketChannel) channel).getRemoteAddress());
+                    }
+                    closeFunction.accept(selectedKey, channel);
+                }
+                else if (readResult == ReadResult.OK && !wasSelected)
+                {
+                    if (LOGGER.isDebugEnabled())
+                    {
+                        LOGGER.debug("Connection was not selected, but data was available and read.");
+                    }
+                }
+            }
+            catch (final Exception e)
+            {
+                closeFunction.accept(selectedKey, channel);
+                exceptionConsumer.accept(e);
             }
         }
 

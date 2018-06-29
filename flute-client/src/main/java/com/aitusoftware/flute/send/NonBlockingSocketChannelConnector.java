@@ -43,6 +43,7 @@ public final class NonBlockingSocketChannelConnector
                 return null;
             }
             channel.configureBlocking(false);
+            channel.socket().setTcpNoDelay(true);
             return channel;
         }
         catch (IOException e)
