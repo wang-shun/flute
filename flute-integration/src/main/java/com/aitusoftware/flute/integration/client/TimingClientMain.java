@@ -28,6 +28,7 @@ import static com.aitusoftware.flute.config.SocketAddressParser.fromAddressSpec;
 public final class TimingClientMain
 {
     private static final long RUNTIME_MINUTES = Long.getLong("flute.test.client.runtime", 4);
+    private static final int SERIES_COUNT = Integer.getInteger("flute.test.client.seriesCount", 6);
 
     public static void main(final String[] args) throws Exception
     {
@@ -44,7 +45,7 @@ public final class TimingClientMain
 
         final TimingClient timingClient =
                 new TimingClient(
-                        TimingClient.RECORDING_SERIES_IDENTIFIER,
+                        SERIES_COUNT,
                         histogramConfig, recordingAddress);
         timingClient.init();
 

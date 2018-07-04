@@ -20,51 +20,68 @@ import com.aitusoftware.flute.factory.RecordingTimeTrackerFactory;
 import com.aitusoftware.flute.record.TimeTracker;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.SocketAddress;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
-public final class TimingClient
+final class TimingClient
 {
-    static final String RECORDING_SERIES_IDENTIFIER = "foo.bar.record";
+    private static final String RECORDING_SERIES_IDENTIFIER =
+            "production.region.1.fleet.public.";
 
-    private final String recordingSeriesIdentifier;
     private final HistogramConfig histogramConfig;
     private final SocketAddress socketAddress;
-    private TimeTracker recordingTimeTracker;
+    private final TimeTracker[] recordingTimeTrackers;
 
-    public TimingClient(
-            final String recordingSeriesIdentifier,
+    TimingClient(
+            final int seriesCount,
             final HistogramConfig histogramConfig,
             final SocketAddress socketAddress)
     {
         this.socketAddress = socketAddress;
-        this.recordingSeriesIdentifier = recordingSeriesIdentifier;
         this.histogramConfig = histogramConfig;
+        this.recordingTimeTrackers = new TimeTracker[seriesCount];
     }
 
-    public void init() throws IOException
+    void init()
     {
-        recordingTimeTracker = new RecordingTimeTrackerFactory().
-                publishingTo(socketAddress).
-                withValidation(true).
-                withHistogramConfig(histogramConfig).
-                publishingEvery(1, TimeUnit.SECONDS).
-                withIdentifer(recordingSeriesIdentifier).
-                create();
+        Arrays.setAll(recordingTimeTrackers, i ->
+        {
+            try
+            {
+                final String identifier = RECORDING_SERIES_IDENTIFIER +
+                        "server" + Long.toHexString(123467 + i * 5);
+                return new RecordingTimeTrackerFactory().
+                        publishingTo(socketAddress).
+                        withValidation(true).
+                        withHistogramConfig(histogramConfig).
+                        publishingEvery(1, TimeUnit.SECONDS).
+                        withIdentifer(identifier).
+                        create();
+            }
+            catch (IOException e)
+            {
+                throw new UncheckedIOException(e);
+            }
+        });
     }
 
-    public void generateTestData(final long duration, final TimeUnit unit)
+    void generateTestData(final long duration, final TimeUnit unit)
     {
         final Random random = new Random(System.currentTimeMillis());
 
         final long endAt = System.currentTimeMillis() + unit.toMillis(duration);
         while(System.currentTimeMillis() < endAt && !Thread.currentThread().isInterrupted())
         {
-            if(recordingTimeTracker != null)
+            for (TimeTracker recordingTimeTracker : recordingTimeTrackers)
             {
-                publishDatum(sampleDuration(random), recordingTimeTracker);
+                if (recordingTimeTracker != null)
+                {
+                    publishDatum(sampleDuration(random), recordingTimeTracker);
+                }
             }
             LockSupport.parkNanos(TimeUnit.MICROSECONDS.toNanos(sampleDuration(random) * 50));
         }
