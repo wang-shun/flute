@@ -18,5 +18,6 @@ package com.aitusoftware.flute.receive;
 public enum ReadResult
 {
     OK,
-    END_OF_STREAM
+    END_OF_STREAM,
+    NO_DATA
 }
