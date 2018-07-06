@@ -112,16 +112,22 @@
         percentileData.sort(function(a, b) {
             return a.index - b.index;
         });
+        // console.log(metricNormalisedName + ' line count: ' + percentileData.length);
         for(var i = 0; i < percentileData.length; i++) {
             var percentiles = percentileData[i];
-
+            var lineDebug = '';
             var line = d3.line().x(function(d) {
+                lineDebug += '(x:' + d.ratio;
                 return xScale(d.ratio);
-            }).y(function(d) { return yScale(d.value); }).
+            }).y(function(d) {
+                lineDebug += ',y:' + d.value + '),';
+                return yScale(d.value);
+            }).
             context(context);
 
             context.beginPath();
             line(percentiles.data);
+            // console.log(percentiles.reportWindow + ': ' + lineDebug);
             context.lineWidth = 1.5;
             context.strokeStyle = d3.schemeCategory10[percentiles.index];
             context.stroke();

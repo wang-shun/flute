@@ -46,9 +46,9 @@ public final class ReportsAcceptanceTest
     @Before
     public void before() throws Exception
     {
-        final TestClient testClientOne = new TestClient(token + ".one");
-        final TestClient testClientTwo = new TestClient(token + ".two");
-        final TestClient testClientThree = new TestClient(token + ".three");
+        final TestClient testClientOne = new TestClient(token + ".one", System.currentTimeMillis());
+        final TestClient testClientTwo = new TestClient(token + ".two", System.currentTimeMillis());
+        final TestClient testClientThree = new TestClient(token + ".three", System.currentTimeMillis());
 
         for(int i = 0; i < 45; i++)
         {

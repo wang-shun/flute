@@ -30,14 +30,15 @@ public final class TestClient
     private static final InetSocketAddress PUBLISH_TARGET = new InetSocketAddress("localhost", 51000);
     private final String metricName;
     private final TimeTracker timeTracker;
-    private final StubClock clock = new StubClock(System.currentTimeMillis());
+    private final StubClock clock;
     private long start;
 
-    public TestClient(final String alias) throws IOException
+    public TestClient(final String alias, final long initialTimestamp) throws IOException
     {
         SystemReadiness.waitForServer(PUBLISH_TARGET);
 
         this.metricName = alias + "." + INSTANCE_ID.getAndIncrement() + "." + System.nanoTime();
+        clock = new StubClock(initialTimestamp);
         this.timeTracker =
                 new RecordingTimeTrackerFactory().
                         withClock(clock::getCurrentMillis).

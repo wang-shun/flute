@@ -75,7 +75,6 @@ final class SlaPercentileChartHandler extends DefaultHandler
         final Set<String> metricIdentifiers;
         if(isAggregator)
         {
-
             metricIdentifiers = metricIdentifierDao.getIdentifiersMatching(query.getMetricKey());
         }
         else

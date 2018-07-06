@@ -52,7 +52,7 @@ public final class MetricIdentifierSearchTest
 
     private String publishMetric(final String alias) throws IOException
     {
-        final TestClient otherTestClient = new TestClient(alias);
+        final TestClient otherTestClient = new TestClient(alias, System.currentTimeMillis());
 
         otherTestClient.recordSample(37L);
         otherTestClient.publish();

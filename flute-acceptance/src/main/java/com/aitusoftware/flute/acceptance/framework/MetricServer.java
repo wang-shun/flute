@@ -39,6 +39,7 @@ public final class MetricServer
     private static final String SLA_QUERY_URI = "/flute/app/query/slaReport/%s/%d/%s/%d";
     private static final String METRIC_SEARCH_URI = "/flute/app/query/metricSearch/%s";
     private static final String SLA_PERCENTILES_URI = "/flute/app/query/slaPercentiles/%s/%d/%s/%d";
+    private static final String LATEST_SLA_PERCENTILES_URI = "/flute/app/query/slaPercentiles/%s/%d/%s";
     private static final String LIST_REPORTS_URI = "/flute/app/query/listReports";
 
     public MetricServer()
@@ -56,6 +57,15 @@ public final class MetricServer
     {
         final List data = querySlaReport(metricName);
         return ((Double)((List) data.get(0)).get(9)).longValue();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> getPercentilesForMetric(
+            final String metricName, final long duration, final TimeUnit durationUnit)
+    {
+        final String url = String.format(SERVER_ADDRESS + LATEST_SLA_PERCENTILES_URI, metricName,
+                duration, durationUnit);
+        return HttpOps.get(url, List.class);
     }
 
     @SuppressWarnings("unchecked")

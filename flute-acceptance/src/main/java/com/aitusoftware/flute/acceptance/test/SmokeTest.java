@@ -29,7 +29,7 @@ public final class SmokeTest
     @Before
     public void before() throws Exception
     {
-        testClient = new TestClient("foo.bar.smoke.test");
+        testClient = new TestClient("foo.bar.smoke.test", System.currentTimeMillis());
     }
 
     @Test
@@ -57,7 +57,7 @@ public final class SmokeTest
     @Test
     public void shouldRecordDataForDifferentMetrics() throws Exception
     {
-        final TestClient otherTestClient = new TestClient("smoke.test1");
+        final TestClient otherTestClient = new TestClient("smoke.test1", System.currentTimeMillis());
 
         testClient.recordSample(500L);
         testClient.recordSample(700L);

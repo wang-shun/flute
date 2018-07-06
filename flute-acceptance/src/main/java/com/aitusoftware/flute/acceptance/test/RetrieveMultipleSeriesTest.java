@@ -29,20 +29,19 @@ import java.util.concurrent.locks.LockSupport;
 
 import static com.aitusoftware.flute.acceptance.framework.Waiter.waitFor;
 
-public final class SlaPercentilesFromAggregatedMetricsTest
+public final class RetrieveMultipleSeriesTest
 {
     private final Random random = new Random(System.currentTimeMillis() + System.nanoTime());
     private final UUID uuid = new UUID(random.nextLong(), random.nextLong());
     private final String token = uuid.toString();
+
     private final MetricServer metricServer = new MetricServer();
-    private long recordingStartTime;
     private TestClient testClient;
 
     @Before
     public void before() throws Exception
     {
-        testClient = new TestClient(token, System.currentTimeMillis());
-        recordingStartTime = testClient.getCurrentTime() - TimeUnit.SECONDS.toMillis(5L);
+        testClient = new TestClient(token, System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(60L));
         for(int i = 0; i < 45; i++)
         {
             recordAndPublish(testClient, random.nextInt(5990));
@@ -52,11 +51,32 @@ public final class SlaPercentilesFromAggregatedMetricsTest
     @Test
     public void shouldSerialisePercentiles() throws Exception
     {
-        final long recordingEndTime = testClient.getCurrentTime() - TimeUnit.SECONDS.toMillis(5L);
         waitFor(() -> {
-            final List<Map<String, Object>> percentilesForMetric = metricServer.getPercentilesForMetric(testClient.getMetricName(), recordingStartTime, recordingEndTime);
-            return percentilesForMetric.size() > 1;
+            final List<Map<String, Object>> recentHistory = metricServer.getPercentilesForMetric(testClient.getMetricName(), 40, TimeUnit.SECONDS);
+            final List<Map<String, Object>> olderHistory = metricServer.getPercentilesForMetric(testClient.getMetricName(), 60, TimeUnit.SECONDS);
+            final List<Map<String, Object>> ancientHistory = metricServer.getPercentilesForMetric(testClient.getMetricName(), 80, TimeUnit.SECONDS);
+
+            return histogramsArePopulatedAndDifferent(recentHistory, olderHistory, ancientHistory);
         });
+    }
+
+    @SafeVarargs
+    private static boolean histogramsArePopulatedAndDifferent(
+            final List<Map<String, Object>>... histogramData)
+    {
+        boolean allDistinct = true;
+        for (int i = 0; i < histogramData.length && allDistinct; i++)
+        {
+            for (int j = 0; j < histogramData.length; j++)
+            {
+                if (i != j && histogramData[i].equals(histogramData[j]))
+                {
+                    allDistinct = false;
+                    break;
+                }
+            }
+        }
+        return allDistinct;
     }
 
     private void recordAndPublish(final TestClient testClient, final int maxEntries)
@@ -66,6 +86,6 @@ public final class SlaPercentilesFromAggregatedMetricsTest
             testClient.recordSample(random.nextInt(65536) + 256);
         }
         testClient.publish();
-        LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(20L));
+        LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(120L));
     }
 }
